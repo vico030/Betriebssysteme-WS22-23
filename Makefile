@@ -34,7 +34,7 @@ DEP = $(OBJ:.o=.d)
 # Regeln
 #
 .PHONY: all 
-all: kernel
+all: kernel.elf
 
 -include $(DEP)
 
