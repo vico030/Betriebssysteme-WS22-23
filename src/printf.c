@@ -1,5 +1,24 @@
-#include "<stdarg.h>"
-#include "<stdio.h>"
+#include "stdarg.h"
+#include "dbgu.h"
+#include "print.h"
+
+
+static char *convert(unsigned int num, int base){
+  static char hex_representation[]= "0123456789ABCDEF";
+  static char buffer[50];
+  char *ptr;
+
+  ptr = &buffer[49];
+  *ptr = '\0';
+
+  do
+  {
+    *--ptr = hex_representation[num % base];
+    num /= base;
+  } while(num != 0);
+
+  return(ptr);
+}
 
 __attribute__((format(printf, 1, 2)))
 void printf(char *fmt, ...) {
@@ -10,56 +29,43 @@ void printf(char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
 
-  for(traverse = fmt; *traverse != '\0'; traverse++)
-  {
-    while(*traverse != '%')
-    {
-      putchar(*traverse);
-      traverse++;
-    }
+  traverse = fmt;
 
+  while(*traverse != '\0')
+  {
+    char next_char = *traverse;
     traverse++;
 
-    switch(*traverse)
+    if(next_char != '%')
+    {
+      write_character(next_char);
+      continue;
+    }
+    next_char = *traverse;
+    traverse++;
+
+    switch(next_char)
     {
       case 'c' :
-        i = va_arg(args, int);           // Fetch char
-        putchar(i);
+        i = va_arg(args, unsigned int );           // Fetch char
+        write_character(i);
         break;
 
       case 's':
         s = va_arg(args, char *);        // Fetch string
-        puts(s);
+        print(s);
         break;
 
       case 'x':
         i = va_arg(args, unsigned int);  // Fetch hexadecimal representation
-        puts(convert(i, 16));
+        print(convert(i, 16));
         break;
 
       case 'p':
-        i = va_arg(args, void*);         // Fetch hexadecimal representation
-        puts(convert(i, 16));
+        i = (unsigned int) va_arg(args, void*);         // Fetch hexadecimal representation
+        print(convert(i, 16));
         break;
     }
   }
   va_end(args);
-}
-
-char *convert(unsigned int num, int base)
-{
-  static char representation[]= "0123456789ABCDEF";
-  static char buffer[50];
-  char *ptr;
-
-  ptr = &buffer[49];
-  *ptr = '\0';
-
-  do
-  {
-    *--ptr = representation[num % base];
-    num /= base;
-  } while(num != 0);
-
-  return(ptr);
 }

@@ -13,9 +13,27 @@ void write_in_console(void){
 
 //  char character = read_character();
 
-  char string[] = "Hello World";
+  char character = 'C';
+  char string[] = "Linnert";
+  int hex = 233; // == E9
+  void * vptr = &hex;
 
-  print(string);
+  char character_format[] = "Hello World! Character: %c was printed.\r\n";
+  char string_format[] = "Hello World! String: %s was printed.\r\n";
+  char hex_format[] = "Hello World! Hex: %x was printed.\r\n";
+  char void_format[] = "Hello World! Void: %p was printed.\r\n";
+
+
+  printf(character_format, character);
+  printf(string_format, string);
+  printf(hex_format, hex);
+  printf(void_format, vptr);
+
+//  printf(character_format);
+//  printf(character_format);
+//  printf(character_format);
+//  printf(character_format);
+
 
 
 //  write_character(character);
