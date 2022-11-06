@@ -1,5 +1,5 @@
 #include "stdarg.h"
-#include "dbgu.h"
+#include "../drv/dbgu.h"
 #include "print.h"
 
 
@@ -47,22 +47,22 @@ void printf(char *fmt, ...) {
     switch(next_char)
     {
       case 'c' :
-        i = va_arg(args, unsigned int );           // Fetch char
+        i = va_arg(args, unsigned int );
         write_character(i);
         break;
 
       case 's':
-        s = va_arg(args, char *);        // Fetch string
+        s = va_arg(args, char *);
         print(s);
         break;
 
       case 'x':
-        i = va_arg(args, unsigned int);  // Fetch hexadecimal representation
+        i = va_arg(args, unsigned int);
         print(convert(i, 16));
         break;
 
       case 'p':
-        i = (unsigned int) va_arg(args, void*);         // Fetch hexadecimal representation
+        i = (unsigned int) va_arg(args, void*);
         print(convert(i, 16));
         break;
     }

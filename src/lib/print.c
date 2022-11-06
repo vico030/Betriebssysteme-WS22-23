@@ -3,7 +3,7 @@
 //
 
 #include "print.h"
-#include "dbgu.h"
+#include "../drv/dbgu.h"
 
 void print(char string[]){
   char *traverse = string;

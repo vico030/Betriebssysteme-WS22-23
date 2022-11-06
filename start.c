@@ -1,4 +1,4 @@
-#include "src/dbgu_test.h"
+#include "src/demo/dbgu_demo.h"
 
 __attribute__((naked, section(".init")))
 void _start(void)

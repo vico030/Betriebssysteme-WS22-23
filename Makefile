@@ -16,7 +16,7 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start2.o src/dbgu.o src/dbgu_test.o src/print.o src/printf.o
+OBJ = start.o src/drv/dbgu.o src/demo/dbgu_demo.o src/lib/print.o src/lib/printf.o
 
 #
 # Konfiguration
