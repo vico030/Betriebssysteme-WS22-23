@@ -16,7 +16,7 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start2.o led1.o
+OBJ = start.o src/drv/dbgu.o src/demo/dbgu_demo.o src/lib/print.o src/lib/printf.o
 
 #
 # Konfiguration
@@ -34,7 +34,7 @@ DEP = $(OBJ:.o=.d)
 # Regeln
 #
 .PHONY: all 
-all: kernel
+all: kernel.elf
 
 -include $(DEP)
 
