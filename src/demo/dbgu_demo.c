@@ -2,9 +2,9 @@
 // Created by marvolo on 06.11.22.
 //
 
-#include "dbgu_test.h"
-#include "dbgu.h"
-#include "print.h"
+#include "dbgu_demo.h"
+#include "../drv/dbgu.h"
+#include "../lib/printf.h"
 
 void write_in_console(void){
   // Initialize DBGU
