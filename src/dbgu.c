@@ -31,12 +31,11 @@
 #define CHMODE_LOOPL (1 << 15) | (0 << 14)
 #define CHMODE_LOOPR (1 << 15) | (1 << 14)
 
-static inline unsigned int read_u32(unsigned int addr){
-  return *(volatile unsigned int *)addr;
+static inline unsigned int read_u32(unsigned int addr) {
+  return *(volatile unsigned int *) addr;
 }
 
-static inline void write_u32(unsigned int addr, unsigned int val)
-{
-  *(volatile unsigned int *)addr = val;
+static inline void write_u32(unsigned int addr, unsigned int val) {
+  *(volatile unsigned int *) addr = val;
 }
 

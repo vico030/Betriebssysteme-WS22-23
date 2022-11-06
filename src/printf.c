@@ -43,7 +43,6 @@ static void printf(char *fmt, ...) {
         break;
     }
   }
-
   va_end(args);
 }
 

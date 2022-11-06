@@ -1,9 +1,9 @@
-#include "led.h"
+#include "src/dbgu_test.h"
 
 __attribute__((naked, section(".init")))
 void _start(void)
 {
-        yellow_on();
-        for(;;);
+  write_in_console();
+  for(;;);
 }
 

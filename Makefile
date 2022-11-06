@@ -16,7 +16,7 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start2.o led1.o
+OBJ = start2.o src/dbgu.o src/dbgu_test.o src/printf.o
 
 #
 # Konfiguration
