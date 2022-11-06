@@ -12,6 +12,7 @@
 #define DBGU_THR 0x001C // Transmit Holding Register Write-only –
 #define DBGU_BRGR 0x0020 // Baud Rate Generator Register Read/Write 0x0
 
+// Control Register
 #define RSTRX 1 << 2 // Reset Receiver
 #define RSTTX 1 << 3 // Reset Transmitter
 #define RXEN 1 << 4 // Receiver Enable
@@ -20,16 +21,30 @@
 #define TXDIS 1 << 7 // Transmitter Disable
 #define RSTSTA 1 << 8 // Reset Status Bits
 
+// Mode Register
 #define PAR_EVEN (0 << 11) | (0 << 10) | (0 << 9)
 #define PAR_ODD (0 << 11) | (0 << 10) | (1 << 9)
 #define PAR_SPACE (0 << 11) | (1 << 10) | (0 << 9)
 #define PAR_MARK (0 << 11) | (1 << 10) | (1 << 9)
 #define PAR_NONE (1 << 11)
-
 #define CHMODE_NORMAL (0 << 15) | (0 << 14)
 #define CHMODE_ECHO (0 << 15) | (1 << 14)
 #define CHMODE_LOOPL (1 << 15) | (0 << 14)
 #define CHMODE_LOOPR (1 << 15) | (1 << 14)
+
+// Status Register
+#define RXRDY 1 << 0 // Receiver Ready
+#define TXRDY 1 << 1 // Transmitter Ready
+#define ENDRX 1 << 3 // End of Receiver Transfer
+#define ENDTX 1 << 4 // End of Transmitter Transfer
+#define OVRE 1 << 5 // Overrun Error
+#define FRAME 1 << 6 // Framing Error
+#define PARE 1 << 7 // Parity Error
+#define TXEMPTY 1 << 9 // Transmitter Empty
+#define TXBUFE 1 << 11 // Transmission Buffer Empty
+#define RXBUFF 1 << 12 // Receive Buffer Full
+#define COMMTX 1 << 30 // Debug Communication Channel Write Status
+#define COMMRX 1 << 31 // Debug Communication Channel Read Status
 
 static inline unsigned int read_u32(unsigned int addr) {
   return *(volatile unsigned int *) addr;

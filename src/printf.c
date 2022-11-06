@@ -2,7 +2,7 @@
 #include "<stdio.h>"
 
 __attribute__((format(printf, 1, 2)))
-static void printf(char *fmt, ...) {
+void printf(char *fmt, ...) {
   char *traverse;
   unsigned int i;
   char *s;
