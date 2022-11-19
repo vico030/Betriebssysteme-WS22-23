@@ -11,15 +11,6 @@
 // MC Remap Control Register
 #define RCB 1 << 0 // Remap Command Bit Toggle
 
-
-
-// check how to trigger interrupt -> access undefined memory
-// trigger abort interrupt by accessing undefined memory address
-unsigned int trigger_abort_interrupt() {
-   return  *(volatile unsigned int*)0x90000000;
-}
-
-
 // where is r9-14 (Doc 8. Memories)
 
 

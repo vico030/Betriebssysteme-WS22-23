@@ -6,6 +6,6 @@
 #include "printf.h"
 
 __attribute__((section(".handlers")))
-void abt_handler() {
-    printf("Interrupt :/\r\n");
+void interrupt_handler() {
+    printf("Interrupt received.\r\n");
 }

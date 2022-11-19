@@ -1,14 +1,15 @@
-.section .ivt, "ax"
+.section .ivt
 
-.global abt_handler
-
+.global vector_table
+.global vector_table_end
 
 vector_table:
-    b abt_handler ; Reset
-    b abt_handler ; Unddefined Instruction
-    b abt_handler ; Software Interrupt
-    b abt_handler ; Prefetch Abort
-    b abt_handler ; Data Abort
-    nop
-    b abt_handler ; IRQ
-    b abt_handler ; FIQ
+	b interrupt_handler // Reset
+	b interrupt_handler // Unddefined Instruction
+	b interrupt_handler // Software Interrupt
+	b interrupt_handler // Prefetch Abort
+	b interrupt_handler // Data Abort
+	nop
+	b interrupt_handler // IRQ
+	b interrupt_handler // FIQ
+vector_table_end:

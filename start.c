@@ -1,10 +1,10 @@
 #include "src/demo/dbgu_demo.h"
-#include "src/drv/remap.h"
+#include "src/demo/mc_demo.h"
 
 __attribute__((section(".init")))
 void _start(void) {
-    enable_MC_remap();
-    write_in_console();
-    for (;;);
+  write_in_console();
+  trigger_abort_interrupt();
+  for (;;);
 }
 
