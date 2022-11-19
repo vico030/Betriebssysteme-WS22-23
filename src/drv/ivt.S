@@ -1,10 +1,11 @@
 .section .ivt, "ax"
 
-.global interrupt_vector_reset
+.data
+var1: .word 3
 
-vector_table:
-.word interrupt_vector_reset
+.global _interrupt_vector_reset
 
+_interrupt_vector_reset:
+    ldr r0, adr_var1
 
-interrupt_vector_reset:
-.word 0x0
+adr_var1: .word var1
