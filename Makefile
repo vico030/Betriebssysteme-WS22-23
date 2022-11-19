@@ -25,7 +25,7 @@ CC = arm-none-eabi-gcc
 LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 
-CFLAGS = -Wall -Wextra -ffreestanding -mcpu=arm920t -O2 -std=c11
+CFLAGS = -Wall -Wextra -ffreestanding -mcpu=arm920t -O2 -std=c11 -fasm -g
 #LIBGCC := $(shell $(CC) -print-libgcc-file-name)
 
 DEP = $(OBJ:.o=.d)

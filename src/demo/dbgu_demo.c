@@ -16,17 +16,20 @@ void write_in_console(void){
   char string[] = "Linnert";
   int hex = 233; // == E9
   void * vptr = &hex;
+  unsigned int dec = 233;
 
   char character_format[] = "Hello World! Character: %c was printed.\r\n";
   char string_format[] = "Hello World! String: %s was printed.\r\n";
   char hex_format[] = "Hello World! Hex: %x was printed.\r\n";
   char void_format[] = "Hello World! Void: %p was printed.\r\n";
+  char dec_format[] = "Hello World! Decimal: %d was printed.\r\n";
 
 
   printf(character_format, character);
   printf(string_format, string);
   printf(hex_format, hex);
   printf(void_format, vptr);
+  printf(dec_format, dec);
 
 
   printf("Enter $ to quit, bro.\r\n");
