@@ -1,11 +1,14 @@
 .section .ivt, "ax"
 
-.data
-var1: .word 3
+.global abt_handler
 
-.global _interrupt_vector_reset
 
-_interrupt_vector_reset:
-    ldr r0, adr_var1
-
-adr_var1: .word var1
+vector_table:
+    b abt_handler ; Reset
+    b abt_handler ; Unddefined Instruction
+    b abt_handler ; Software Interrupt
+    b abt_handler ; Prefetch Abort
+    b abt_handler ; Data Abort
+    nop
+    b abt_handler ; IRQ
+    b abt_handler ; FIQ
