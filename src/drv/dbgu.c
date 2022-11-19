@@ -1,7 +1,9 @@
 #include "dbgu.h"
+#include "../lib/io.h"
 
 #define DBGU 0xFFFFF200
 
+// Offsets
 #define DBGU_CR 0x0000 // Control Register Write-only -
 #define DBGU_MR 0x0004 // Mode Register Read/Write 0x0
 #define DBGU_IER 0x0008 // Interrupt Enable Register Write-only –
@@ -46,21 +48,21 @@
 #define COMMTX 1 << 30 // Debug Communication Channel Write Status
 #define COMMRX 1 << 31 // Debug Communication Channel Read Status
 
-static inline unsigned int read_u32(unsigned int addr) {
-  return *(volatile unsigned int *) addr;
-}
-
-static inline void write_u32(unsigned int addr, unsigned int val) {
-  *(volatile unsigned int *) addr = val;
-}
-
-static inline unsigned char read_u8(unsigned int addr) {
-  return *(volatile unsigned char *) addr;
-}
-
-static inline void write_u8(unsigned int addr, unsigned char val) {
-  *(volatile unsigned int *) addr = val;
-}
+//static inline unsigned int read_u32(unsigned int addr) {
+//  return *(volatile unsigned int *) addr;
+//}
+//
+//static inline void write_u32(unsigned int addr, unsigned int val) {
+//  *(volatile unsigned int *) addr = val;
+//}
+//
+//static inline unsigned char read_u8(unsigned int addr) {
+//  return *(volatile unsigned char *) addr;
+//}
+//
+//static inline void write_u8(unsigned int addr, unsigned char val) {
+//  *(volatile unsigned int *) addr = val;
+//}
 
 
 inline void enable_DBGU_receive(void) {
