@@ -3,7 +3,7 @@
 .global interrupt_vector_reset
 
 vector_table:
-ldr PC, interrupt_vector_reset
+.word interrupt_vector_reset
 
 
 interrupt_vector_reset:
