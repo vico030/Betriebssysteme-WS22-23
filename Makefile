@@ -16,7 +16,7 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start.o src/drv/dbgu.o src/demo/dbgu_demo.o src/lib/print.o src/lib/printf.o src/drv/remap.o src/lib/io.o
+OBJ = start.o src/drv/dbgu.o src/demo/dbgu_demo.o src/lib/print.o src/lib/printf.o src/drv/remap.o src/lib/io.o src/drv/ivt.S
 
 #
 # Konfiguration
