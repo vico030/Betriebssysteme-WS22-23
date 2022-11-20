@@ -9,14 +9,19 @@
 __attribute__((section(".init")))
 void _start(void) {
   enable_DBGU_transmit();
+  enable_DBGU_receive();
+
+  printf("\r\n");
+  printf("******************************\r\n");
+  printf("*** Booting GyrOS (R) 2022 ***\r\n");
+  printf("******************************\r\n");
+  printf("\r\n");
   printf("Enable memory remap...\r\n");
   enable_MC_remap();
 
   init_system();
 
-  write_in_console();
-  trigger_abort_interrupt();
-  write_in_console();
+  mc_demo();
 
   for (;;);
 }
