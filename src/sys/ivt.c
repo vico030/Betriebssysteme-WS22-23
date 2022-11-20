@@ -4,7 +4,7 @@
 
 __attribute__((naked, section(".ivt")))
 void ivt() {
-  asm("b interrupt_handler \n\t");
+  asm("nop");
   asm("b interrupt_handler ");
   asm("b interrupt_handler ");
   asm("b interrupt_handler ");

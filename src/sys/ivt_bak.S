@@ -1,6 +1,6 @@
 
-//.section .ivt
-//	b interrupt_handler // Reset
+//.section .ivt, "ax"
+//	nop                 // Reset
 //	b interrupt_handler // Unddefined Instruction
 //	b interrupt_handler // Software Interrupt
 //	b interrupt_handler // Prefetch Abort
