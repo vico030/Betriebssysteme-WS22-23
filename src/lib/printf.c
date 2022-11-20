@@ -3,7 +3,7 @@
 #include "print.h"
 
 
-static char *convert(unsigned int num, int base){
+static char *convert_hex(unsigned int num, int base){
   static char hex_representation[]= "0123456789ABCDEF";
   static char buffer[50];
   char *ptr;
@@ -15,6 +15,23 @@ static char *convert(unsigned int num, int base){
   {
     *--ptr = hex_representation[num % base];
     num /= base;
+  } while(num != 0);
+
+  return(ptr);
+}
+
+static char *convert_dec(unsigned int num){
+  static char dec_representation[]= "0123456789";
+  static char buffer[50];
+  char *ptr;
+
+  ptr = &buffer[49];
+  *ptr = '\0';
+
+  do
+  {
+    *--ptr = dec_representation[num % 10];
+    num /= 10;
   } while(num != 0);
 
   return(ptr);
@@ -56,14 +73,19 @@ void printf(char *fmt, ...) {
         print(s);
         break;
 
+      case 'd':
+        i = va_arg(args, unsigned int);
+        print(convert_dec(i));
+        break;
+
       case 'x':
         i = va_arg(args, unsigned int);
-        print(convert(i, 16));
+        print(convert_hex(i, 16));
         break;
 
       case 'p':
         i = (unsigned int) va_arg(args, void*);
-        print(convert(i, 16));
+        print(convert_hex(i, 16));
         break;
     }
   }

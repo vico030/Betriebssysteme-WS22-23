@@ -1,7 +1,9 @@
 #include "dbgu.h"
+#include "../lib/io.h"
 
 #define DBGU 0xFFFFF200
 
+// Offsets
 #define DBGU_CR 0x0000 // Control Register Write-only -
 #define DBGU_MR 0x0004 // Mode Register Read/Write 0x0
 #define DBGU_IER 0x0008 // Interrupt Enable Register Write-only –
@@ -46,88 +48,88 @@
 #define COMMTX 1 << 30 // Debug Communication Channel Write Status
 #define COMMRX 1 << 31 // Debug Communication Channel Read Status
 
-static inline unsigned int read_u32(unsigned int addr) {
-  return *(volatile unsigned int *) addr;
-}
-
-static inline void write_u32(unsigned int addr, unsigned int val) {
-  *(volatile unsigned int *) addr = val;
-}
-
-static inline unsigned char read_u8(unsigned int addr) {
-  return *(volatile unsigned char *) addr;
-}
-
-static inline void write_u8(unsigned int addr, unsigned char val) {
-  *(volatile unsigned int *) addr = val;
-}
+//static inline unsigned int read_u32(unsigned int addr) {
+//  return *(volatile unsigned int *) addr;
+//}
+//
+//static inline void write_u32(unsigned int addr, unsigned int val) {
+//  *(volatile unsigned int *) addr = val;
+//}
+//
+//static inline unsigned char read_u8(unsigned int addr) {
+//  return *(volatile unsigned char *) addr;
+//}
+//
+//static inline void write_u8(unsigned int addr, unsigned char val) {
+//  *(volatile unsigned int *) addr = val;
+//}
 
 
 inline void enable_DBGU_receive(void) {
-  write_u32(DBGU + DBGU_CR, RXEN);
+    write_u32(DBGU + DBGU_CR, RXEN);
 }
 
 inline void disable_DBGU_receive(void) {
-  write_u32(DBGU + DBGU_CR, RXDIS);
+    write_u32(DBGU + DBGU_CR, RXDIS);
 }
 
 inline void enable_DBGU_transmit(void) {
-  write_u32(DBGU + DBGU_CR, TXEN);
+    write_u32(DBGU + DBGU_CR, TXEN);
 }
 
 inline void disable_DBGU_transmit(void) {
-  write_u32(DBGU + DBGU_CR, TXDIS);
+    write_u32(DBGU + DBGU_CR, TXDIS);
 }
 
 
 inline int set_parity_mode(unsigned int mode) {
-  if (
-      mode == (PAR_EVEN) ||
-      mode == (PAR_ODD) ||
-      mode == (PAR_SPACE) ||
-      mode == (PAR_MARK) ||
-      mode == (PAR_NONE)
-      ) {
-    write_u32(DBGU + DBGU_MR, mode);
-    return 0;
-  }
-  return 1;
+    if (
+            mode == (PAR_EVEN) ||
+            mode == (PAR_ODD) ||
+            mode == (PAR_SPACE) ||
+            mode == (PAR_MARK) ||
+            mode == (PAR_NONE)
+            ) {
+        write_u32(DBGU + DBGU_MR, mode);
+        return 0;
+    }
+    return 1;
 }
 
 inline int set_channel_mode(unsigned int mode) {
-  if (
-      mode == (CHMODE_NORMAL) ||
-      mode == (CHMODE_ECHO) ||
-      mode == (CHMODE_LOOPL) ||
-      mode == (CHMODE_LOOPR)
-      ) {
-    write_u32(DBGU + DBGU_MR, mode);
-    return 0;
-  }
-  return 1;
+    if (
+            mode == (CHMODE_NORMAL) ||
+            mode == (CHMODE_ECHO) ||
+            mode == (CHMODE_LOOPL) ||
+            mode == (CHMODE_LOOPR)
+            ) {
+        write_u32(DBGU + DBGU_MR, mode);
+        return 0;
+    }
+    return 1;
 }
 
 
 inline char read_character(void) {
-  while((read_u32(DBGU + DBGU_SR) & RXRDY) == 0);
-  return (char) read_u32(DBGU + DBGU_RHR);
+    while ((read_u32(DBGU + DBGU_SR) & RXRDY) == 0);
+    return (char) read_u32(DBGU + DBGU_RHR);
 }
 
 inline void write_character(unsigned char character) {
-  while((read_u32(DBGU + DBGU_SR) & TXRDY) == 0);
-  write_u8(DBGU + DBGU_THR, character);
+    while ((read_u32(DBGU + DBGU_SR) & TXRDY) == 0);
+    write_u8(DBGU + DBGU_THR, character);
 }
 
-inline char* read_buffer(char buffer[], int len) {
-  for ( int i = 0; i < len-1; i++ ){
-    unsigned char character = read_character();
-    buffer[i] = character;
-    if(character == '\0'){
-      return buffer;
+inline char *read_buffer(char buffer[], int len) {
+    for (int i = 0; i < len - 1; i++) {
+        unsigned char character = read_character();
+        buffer[i] = character;
+        if (character == '\0') {
+            return buffer;
+        }
     }
-  }
 
-  buffer[len] = '\0';
-  return buffer;
+    buffer[len] = '\0';
+    return buffer;
 }
 
