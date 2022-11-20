@@ -1,15 +1,12 @@
-//
-// Created by marvolo on 19.11.22.
-//
 
 __attribute__((naked, section(".ivt")))
 void ivt() {
+  asm("nop");                                        // Reset
+  asm("b undefined_instruction_handler");
+  asm("b software_interrupt_handler");
+  asm("b generic_interrupt_handler");               // Prefetch Abort
+  asm("b data_abort_handler");
   asm("nop");
-  asm("b interrupt_handler ");
-  asm("b interrupt_handler ");
-  asm("b interrupt_handler ");
-  asm("b interrupt_handler ");
-  asm("nop");
-  asm("b interrupt_handler ");
-  asm("b interrupt_handler ");
+  asm("b generic_interrupt_handler ");              // IRQ
+  asm("b generic_interrupt_handler ");              // FIQ
 }

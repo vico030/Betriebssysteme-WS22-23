@@ -5,7 +5,7 @@
 `qemu-bsprak -kernel kernel.elf`
 
 ### obj dump
-`arm-none-eabi-objdump -fhd kernel`
+`arm-none-eabi-objdump -fhd kernel.elf`
 
 ### start qemu with kernel local
 `./arm-softmmu/qemu-system-arm \
