@@ -1,5 +1,6 @@
 #include "dbgu.h"
 #include "../lib/io.h"
+#include "../lib/loop_queue.h"
 
 #define DBGU 0xFFFFF200
 
@@ -49,6 +50,10 @@
 #define COMMRX 1 << 31 // Debug Communication Channel Read Status
 
 
+char test_buffer[256];
+loop_queue DBGU_LQ = {buffer_size, 0,0,0,test_buffer};
+//static loop_queue DBGU_LQ;
+
 inline void enable_DBGU_receive(void) {
     write_u32(DBGU + DBGU_CR, RXEN);
 }
@@ -69,7 +74,7 @@ inline void enable_DBGU_interrupt(void) {
   write_u32(DBGU + DBGU_IER, RXRDY);
 }
 
-inline void disble_DBGU_interrupt(void){
+inline void disable_DBGU_interrupt(void){
   write_u32(DBGU + DBGU_IDR, RXRDY);
 }
 
@@ -101,27 +106,33 @@ inline int set_channel_mode(unsigned int mode) {
 }
 
 
+inline void init_DBGU(){
+//  char test_buffer[256];
+//  loop_queue DBGU_LQ = {buffer_size, 0,0,0,test_buffer};
+
+  enable_DBGU_interrupt();
+  enable_DBGU_transmit();
+  enable_DBGU_receive();
+}
+
 inline char read_character(void) {
-    while ((read_u32(DBGU + DBGU_SR) & RXRDY) == 0);
-    return (char) read_u32(DBGU + DBGU_RHR);
+    //while ((read_u32(DBGU + DBGU_SR) & RXRDY) == 0);
+    //return (char) read_u32(DBGU + DBGU_RHR);
+    if(DBGU_LQ.size_content > 0) return lq_pop(&DBGU_LQ);
+    return '\0';
+}
+
+inline void push_to_lq(){
+  lq_push(&DBGU_LQ, (char) read_u32(DBGU + DBGU_RHR));
+}
+
+inline char pop_from_lq(){
+  return lq_pop(&DBGU_LQ);
 }
 
 inline void write_character(unsigned char character) {
     while ((read_u32(DBGU + DBGU_SR) & TXRDY) == 0);
     write_u8(DBGU + DBGU_THR, character);
-}
-
-inline char *read_buffer(char buffer[], int len) {
-    for (int i = 0; i < len - 1; i++) {
-        unsigned char character = read_character();
-        buffer[i] = character;
-        if (character == '\0') {
-            return buffer;
-        }
-    }
-
-    buffer[len] = '\0';
-    return buffer;
 }
 
 int is_readable(){

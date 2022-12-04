@@ -43,14 +43,3 @@ void write_in_console(void) {
   }
 
 }
-
-void console_input(void){
-  while (1) {
-    char read_char = read_character();
-    if (read_char == '$') {
-      printf("You exited input mode. :)\r\n");
-      break;
-    }
-    printf("%c", read_char);
-  }
-}
