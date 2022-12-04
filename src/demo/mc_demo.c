@@ -22,7 +22,7 @@ void trigger_software_interrupt() {
 
   printf("Now triggering software interrupt...\r\n");
 
-  asm("SWI 0x123456");
+  asm("SWI 12");
 
   printf("...\r\n");
 }
@@ -44,13 +44,15 @@ void mc_demo(){
   printf("   3 - Undefined Instruction\r\n");
   printf("   $ - Exit input mode \r\n");
 
-  while(1) {
+  int loop = 1;
+
+  while(loop) {
     char read_char = read_character();
-    if(read_char == '$') {
-      printf("You exited input mode. :)\r\n");
-      break;
-    }
     switch(read_char){
+      case '$':
+        loop = 0;
+        printf("You exited input mode. :)\r\n");
+        break;
       case '1':
         trigger_abort_interrupt();
         break;

@@ -10,6 +10,7 @@ SECTIONS
    	*(.data_abort_handler);
     *(.software_interrupt_handler);
     *(.undefined_instruction_handler);
+    *(.normal_interrupt_handler);
     }
 
 

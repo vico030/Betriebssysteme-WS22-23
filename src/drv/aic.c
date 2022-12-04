@@ -8,24 +8,34 @@
 #define AIC 0xFFFFF000
 
 // Offsets
-#define AIC_SMR1 0x40
-#define AIC_IECR 0x120
+#define AIC_SMR1 0x40 // Source Mode Register Reserved for System Peripherals (ST, RTC, PMC, DBGU…)
+#define AIC_IECR 0x120 // Interrupt Enable Command Register
+#define AIC_SVR1 0x84 // Source Vector Register (Address of Handler)
+#define AIC_EOICR 0x130
 
 #define FIQ 1 << 0
 #define SYS 1 << 1
 
 // Source Mode Register
-#define AIC_SRCTYPE00 0 << 5
-#define AIC_SRCTYPE01 1 << 5
-#define AIC_SRCTYPE10 2 << 5
-#define AIC_SRCTYPE11 3 << 5
+//                              Internal Source         | External Source
+#define AIC_SRCTYPE00 0 << 5 // High-level Sensitive    | Low-level Sensitive
+#define AIC_SRCTYPE01 1 << 5 // Positive-edge Triggered | Negative-edge Triggered
+#define AIC_SRCTYPE10 2 << 5 // High-level Sensitive    | High-level Sensitive
+#define AIC_SRCTYPE11 3 << 5 // Positive-edge Triggered | Positive-edge Triggered
 
 
-void init_smr1() {
+void init_sys_smr() {
   write_u32(AIC + AIC_SMR1, AIC_SRCTYPE00 | 7); // Source Type | Priority Level
 }
 
-void init_sys_interrupt() {
+void enable_sys_interrupt() {
   write_u32(AIC + AIC_IECR, SYS);
 }
+
+void set_sys_handler_address(unsigned int address){
+  write_u32(AIC + AIC_SVR1, address);
+}
+
+// Interrupt Vector register read -> Handling start
+// End of Interrupt Command Register -> Handling end
 

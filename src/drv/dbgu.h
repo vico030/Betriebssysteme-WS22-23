@@ -9,6 +9,8 @@ void enable_DBGU_receive();
 void disable_DBGU_receive();
 void enable_DBGU_transmit();
 void disable_DBGU_transmit();
+void enable_DBGU_interrupt();
+void disable_DBGU_interrupt();
 
 int set_parity_mode(unsigned int);
 int set_channel_mode();

@@ -81,6 +81,13 @@ inline void disable_DBGU_transmit(void) {
     write_u32(DBGU + DBGU_CR, TXDIS);
 }
 
+inline void enable_DBGU_interrupt(void) {
+  write_u32(DBGU + DBGU_IER, RXRDY);
+}
+
+inline void disble_DBGU_interrupt(void){
+  write_u32(DBGU + DBGU_IDR, RXRDY);
+}
 
 inline int set_parity_mode(unsigned int mode) {
     if (

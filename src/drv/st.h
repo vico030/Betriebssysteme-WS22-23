@@ -7,6 +7,7 @@
 
 void enable_period_interval_interrupt(void);
 
-int set_period_interval(unsigned short);
+void set_period_interval(unsigned short);
 
+unsigned int read_timer_status_register_PITS(void);
 #endif //BETRIEBSSYSTEME_WS22_23_ST_H

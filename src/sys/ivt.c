@@ -7,6 +7,6 @@ void ivt() {
   asm("b generic_interrupt_handler");               // Prefetch Abort
   asm("b data_abort_handler");
   asm("nop");
-  asm("b generic_interrupt_handler ");              // IRQ
-  asm("b generic_interrupt_handler ");              // FIQ
+  asm("b normal_interrupt_handler");              // IRQ
+  asm("b generic_interrupt_handler");              // FIQ
 }
