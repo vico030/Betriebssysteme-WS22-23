@@ -2,12 +2,12 @@
 
 #define I_BIT 1 << 7
 #define F_BIT 1 << 6
-#define ARM_MODE_FIQ    0b10001 | I_BIT | F_BIT
-#define ARM_MODE_IRQ    0b10010 | I_BIT | F_BIT
-#define ARM_MODE_SVC    0b10011 | I_BIT | F_BIT
-#define ARM_MODE_ABT    0b10111 | I_BIT | F_BIT
-#define ARM_MODE_UND    0b11011 | I_BIT | F_BIT
-#define ARM_MODE_SYS    0b11111 | I_BIT | F_BIT
+#define ARM_MODE_FIQ    0b10001 //| I_BIT | F_BIT
+#define ARM_MODE_IRQ    0b10010 //| I_BIT | F_BIT
+#define ARM_MODE_SVC    0b10011 //| I_BIT | F_BIT
+#define ARM_MODE_ABT    0b10111 //| I_BIT | F_BIT
+#define ARM_MODE_UND    0b11011 //| I_BIT | F_BIT
+#define ARM_MODE_SYS    0b11111 //| I_BIT | F_BIT
 
 void init_stack_pointer(unsigned int mode, unsigned int ptr) {
   asm volatile(

@@ -9,5 +9,6 @@ void generic_interrupt_handler();
 void undefined_instruction_handler();
 void software_interrupt_handler();
 void data_abort_handler();
+void normal_interrupt_handler();
 
 #endif //BETRIEBSSYSTEME_WS22_23_INTERRUPT_HANDLER_H
