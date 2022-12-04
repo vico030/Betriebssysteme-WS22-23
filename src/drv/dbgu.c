@@ -48,22 +48,6 @@
 #define COMMTX 1 << 30 // Debug Communication Channel Write Status
 #define COMMRX 1 << 31 // Debug Communication Channel Read Status
 
-//static inline unsigned int read_u32(unsigned int addr) {
-//  return *(volatile unsigned int *) addr;
-//}
-//
-//static inline void write_u32(unsigned int addr, unsigned int val) {
-//  *(volatile unsigned int *) addr = val;
-//}
-//
-//static inline unsigned char read_u8(unsigned int addr) {
-//  return *(volatile unsigned char *) addr;
-//}
-//
-//static inline void write_u8(unsigned int addr, unsigned char val) {
-//  *(volatile unsigned int *) addr = val;
-//}
-
 
 inline void enable_DBGU_receive(void) {
     write_u32(DBGU + DBGU_CR, RXEN);
@@ -138,5 +122,9 @@ inline char *read_buffer(char buffer[], int len) {
 
     buffer[len] = '\0';
     return buffer;
+}
+
+int is_readable(){
+  return read_u32(DBGU + DBGU_SR) & RXRDY;
 }
 

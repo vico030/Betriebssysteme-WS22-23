@@ -6,5 +6,6 @@
 #define BETRIEBSYSTEME_WS22_23_DBGU_TEST_H
 
 void write_in_console();
+void console_input(void);
 
 #endif //BETRIEBSYSTEME_WS22_23_DBGU_TEST_H

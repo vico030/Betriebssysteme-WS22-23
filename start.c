@@ -53,6 +53,7 @@ void _start(void) {
   // Demo Programs
   //mc_demo();
   //write_in_console();
+  //console_input();
 
   for (;;);
 }

@@ -6,7 +6,7 @@
 #include "../drv/dbgu.h"
 #include "../lib/printf.h"
 
-void write_in_console(void){
+void write_in_console(void) {
   // Initialize DBGU
   enable_DBGU_transmit();
   enable_DBGU_receive();
@@ -15,7 +15,7 @@ void write_in_console(void){
   char character = 'C';
   char string[] = "Linnert";
   int hex = 233; // == E9
-  void * vptr = &hex;
+  void *vptr = &hex;
   unsigned int dec = 233;
 
   char character_format[] = "Hello World! Character: %c was printed.\r\n";
@@ -33,12 +33,24 @@ void write_in_console(void){
 
 
   printf("Enter $ to quit, bro.\r\n");
-  while(1) {
+  while (1) {
     char read_char = read_character();
-    if(read_char == '$') {
+    if (read_char == '$') {
       printf("You exited input mode. :)\r\n");
       break;
     }
     printf("You entered the following character: %c\r\n", read_char);
+  }
+
+}
+
+void console_input(void){
+  while (1) {
+    char read_char = read_character();
+    if (read_char == '$') {
+      printf("You exited input mode. :)\r\n");
+      break;
+    }
+    printf("%c", read_char);
   }
 }

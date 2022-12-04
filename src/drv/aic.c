@@ -11,7 +11,8 @@
 #define AIC_SMR1 0x40 // Source Mode Register Reserved for System Peripherals (ST, RTC, PMC, DBGU…)
 #define AIC_IECR 0x120 // Interrupt Enable Command Register
 #define AIC_SVR1 0x84 // Source Vector Register (Address of Handler)
-#define AIC_EOICR 0x130
+#define AIC_EOICR 0x130 //  End of Interrupt Command Register
+#define AIC_ICCR 0x128 // Interrupt Clear Command Register
 
 #define FIQ 1 << 0
 #define SYS 1 << 1
@@ -36,6 +37,13 @@ void set_sys_handler_address(unsigned int address){
   write_u32(AIC + AIC_SVR1, address);
 }
 
+void end_interrupt_request_handling(){
+  write_u32(AIC + AIC_EOICR,1);
+}
+
+void clear_sys_interrupt(){
+  write_u32(AIC + AIC_ICCR,SYS);
+}
 // Interrupt Vector register read -> Handling start
 // End of Interrupt Command Register -> Handling end
 
