@@ -3,12 +3,8 @@
 //
 
 #include "exception_handler.h"
-#include "printf.h"
+#include "../lib/printf.h"
 #include "../drv/mc.h"
-#include "../drv/aic.h"
-#include "../drv/st.h"
-#include "../drv/dbgu.h"
-#include "../lib/loop_queue.h"
 
 
 void stop_execution() {
@@ -66,26 +62,4 @@ void undefined_instruction_handler() {
   //asm volatile("ldmfd SP!, {r0-r12, PC}^");
 
   stop_execution();
-}
-
-
-__attribute__((section(".normal_interrupt_handler")))
-void normal_interrupt_handler() {
-  asm volatile(
-      "sub  r14, r14, #4 \n\t"
-      "stmfd SP!, {r0-r12, r14}  \n\t");
-
-  // triggered by PITS when counter reached 0
-  if(read_timer_status_register_PITS()) {
-    printf("!\r\n");
-  }
-
-  // triggered by DBGU when readable char
-  if(is_readable()) {
-    // write in buffer
-    push_to_lq();
-  }
-  asm volatile("ldmfd SP!, {r0-r12, PC}^");
-//  end_interrupt_request_handling();
-//  clear_sys_interrupt();
 }

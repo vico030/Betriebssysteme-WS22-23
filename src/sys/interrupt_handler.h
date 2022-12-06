@@ -1,0 +1,10 @@
+//
+// Created by marvolo on 06.12.22.
+//
+
+#ifndef BETRIEBSYSTEME_WS22_23_INTERRUPT_HANDLER_H
+#define BETRIEBSYSTEME_WS22_23_INTERRUPT_HANDLER_H
+
+void normal_interrupt_handler();
+
+#endif //BETRIEBSYSTEME_WS22_23_INTERRUPT_HANDLER_H

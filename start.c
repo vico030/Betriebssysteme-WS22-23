@@ -5,6 +5,7 @@
 #include "src/sys/init.h"
 #include "src/drv/aic.h"
 #include "src/drv/st.h"
+#include "src/sys/interrupt_handler.h"
 
 
 void mask_interrupt_bits_I_F() {
@@ -19,6 +20,7 @@ __attribute__((section(".init")))
 void _start(void) {
   // IRQ / FIQ enabler
   mask_interrupt_bits_I_F();
+  set_sys_handler_address((unsigned int) &normal_interrupt_handler);
 
   // System Timer
   set_period_interval(34464);

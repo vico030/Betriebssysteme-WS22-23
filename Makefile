@@ -16,7 +16,12 @@
 # Quellen
 #
 LSCRIPT = kernel.lds
-OBJ = start.o src/drv/dbgu.o src/demo/dbgu_demo.o src/lib/print.o src/lib/printf.o src/drv/mc.o src/drv/aic.o src/drv/st.o src/demo/mc_demo.o src/demo/aic_demo.o src/lib/io.o src/lib/loop_queue.o src/sys/ivt.o src/sys/init.o src/lib/exception_handler.o
+
+OBJ = start.o
+OBJ += src/sys/ivt.o src/sys/init.o src/sys/exception_handler.o src/sys/interrupt_handler.o
+OBJ += src/lib/print.o src/lib/printf.o src/lib/io.o src/lib/loop_queue.o
+OBJ += src/drv/dbgu.o src/drv/mc.o src/drv/aic.o src/drv/st.o
+OBJ += src/demo/dbgu_demo.o src/demo/mc_demo.o src/demo/aic_demo.o
 
 #
 # Konfiguration
