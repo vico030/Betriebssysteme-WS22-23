@@ -1,2 +1,2 @@
 
-void init_system();
+void init_stacks();

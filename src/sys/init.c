@@ -24,13 +24,12 @@ void init_stack_pointer(unsigned int mode, unsigned int ptr) {
 }
 
 
-void init_system(){
-  printf("Initializing stacks...\r\n");
+void init_stacks(){
+  printf("Initializing other stacks... ");
   init_stack_pointer(ARM_MODE_FIQ, 0x00001000);
   init_stack_pointer(ARM_MODE_IRQ, 0x00002000);
-  // init_stack_pointer(ARM_MODE_SVC, 0x00003000); // crash
-  init_stack_pointer(ARM_MODE_ABT, 0x00004000);
-  init_stack_pointer(ARM_MODE_UND, 0x00005000);
-  init_stack_pointer(ARM_MODE_SYS, 0x24000000);
-  printf("Initialization done.\r\n");
+  init_stack_pointer(ARM_MODE_ABT, 0x00003000);
+  init_stack_pointer(ARM_MODE_UND, 0x00004000);
+  init_stack_pointer(ARM_MODE_SYS, 0x00005000);
+  printf("Done.\r\n");
 }
