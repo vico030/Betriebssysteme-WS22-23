@@ -18,7 +18,7 @@
 LSCRIPT = kernel.lds
 
 OBJ = start.o
-OBJ += src/sys/ivt.o src/sys/init.o src/sys/exception_handler.o src/sys/interrupt_handler.o
+OBJ += src/sys/ivt.o src/sys/init.o src/sys/exception_handler.o src/sys/interrupt_handler.o src/sys/thread.o
 OBJ += src/lib/print.o src/lib/printf.o src/lib/loop_queue.o #src/lib/io.o
 OBJ += src/drv/dbgu.o src/drv/mc.o src/drv/aic.o src/drv/st.o
 OBJ += src/demo/dbgu_demo.o src/demo/mc_demo.o src/demo/aic_demo.o

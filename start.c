@@ -6,6 +6,7 @@
 #include "src/drv/aic.h"
 #include "src/drv/st.h"
 #include "src/sys/interrupt_handler.h"
+#include "src/sys/thread.h"
 
 
 void mask_interrupt_bits_I_F() {
@@ -54,11 +55,15 @@ void _start(void) {
   enable_MC_remap();
   printf("Done.\r\n");
 
+  printf("Setting up TCB container... ");
+  init_tcb_management();
+  printf("Done.\r\n");
+
 
   printf("\r\nStarting Demo Program... \r\n\r\n");
-  print_timed_output();
+  //print_timed_output();
 
 
-  for (;;);
+  while(1);
 }
 

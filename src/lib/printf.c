@@ -20,19 +20,29 @@ static char *convert_hex(unsigned int num, int base){
   return(ptr);
 }
 
-static char *convert_dec(unsigned int num){
+static char *convert_dec(int num){
   static char dec_representation[]= "0123456789";
   static char buffer[50];
   char *ptr;
+  int is_negative = 0;
 
   ptr = &buffer[49];
   *ptr = '\0';
+
+  if (num < 0) {
+    is_negative = 1;
+    num *= -1;
+  }
 
   do
   {
     *--ptr = dec_representation[num % 10];
     num /= 10;
   } while(num != 0);
+
+  if(is_negative && (ptr >= &buffer[0]) ){
+    *--ptr = '-';
+  }
 
   return(ptr);
 }
@@ -74,7 +84,7 @@ void printf(char *fmt, ...) {
         break;
 
       case 'd':
-        i = va_arg(args, unsigned int);
+        i = va_arg(args, int);
         print(convert_dec(i));
         break;
 
