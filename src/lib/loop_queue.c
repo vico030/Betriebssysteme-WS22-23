@@ -4,6 +4,7 @@
 typedef loop_queue lq;
 
 void lq_push(lq* self, char c){
+  printf(">> pushed character %c\r\n", c);
   if(self->size_buffer > self->size_content){
     self->buffer[self->write_pointer] = c;
     self->write_pointer = (self->write_pointer + 1) & buffer_size;

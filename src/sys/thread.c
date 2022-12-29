@@ -36,36 +36,40 @@ tcb_container container;
 // TCB linked List
 
 int get_empty_tcb_slot() {
-  if (container.tcb_count == 0) return 0;
-  for (int i = ((container.tcb_current_id + 1) & (THREAD_AMOUNT - 1));
+  if (container.tcb_count == 0) {
+    printf("+ found slot 0\r\n");
+    return 0;
+  }
+  for (int i = ((container.tcb_current_id + 1) & (THREAD_AMOUNT - 1)); // Todo: Problematic loop on ID = -1!
        i != container.tcb_current_id;
        i = (i + 1) & (THREAD_AMOUNT - 1)) {
     // is tcb_array null?
     if (container.tcb_array[i].state == TERMINATED) {
+      printf("+ found slot %d\r\n", i);
       return i;
     }
   }
+  printf("+ ERROR: No empty Thread\r\n");
   return -1;
 }
 
 void init_tcb_container(tcb_container *cont) {
-  cont->tcb_current_id = 0;
+  cont->tcb_current_id = -1;
   cont->tcb_count = 0;
   for (int i = 0; i < THREAD_AMOUNT; i++) {
     cont->tcb_array[i].state = TERMINATED;
   }
 }
 
-void init_tcb_management (){
+void init_tcb_management() {
   init_tcb_container(&container);
 }
 
 void create_thread(unsigned int function_ptr) {
-  printf("creating thread...\r\n");
+  printf("+ creating thread...\r\n");
   int slot = get_empty_tcb_slot();
-  printf("found slot %d\r\n", slot);
   if (slot != -1) {
-    tcb* new_thread = &container.tcb_array[slot];
+    tcb *new_thread = &container.tcb_array[slot];
     new_thread->id = slot;
     new_thread->state = READY;
     new_thread->stack_pointer = BASE_ADDRESS - slot * STACK_SIZE;
@@ -82,80 +86,131 @@ void create_thread(unsigned int function_ptr) {
 //    }
 //    // set SP so all values can be popped on switch
 //    new_thread->stack_pointer -= 16;
-    printf("thread created\r\n");
-    printf("new thread state: %d, id: %d, sp: 0x%x, fp: 0x%x \r\n",new_thread->state, new_thread->id, new_thread->stack_pointer, function_ptr);
+    printf("+ thread created\r\n");
+    printf("+ new thread state: %d, id: %d, sp: 0x%x, fp: 0x%x \r\n", new_thread->state, new_thread->id,
+           new_thread->stack_pointer, function_ptr);
   }
 }
 
 void delete_thread() {
-  printf("deleting thread...\r\n");
+  printf("- deleting thread...\r\n");
   // Todo: set all tcb values to 0
   container.tcb_array[container.tcb_current_id].state = TERMINATED;
   container.tcb_count--;
+  // Todo: Current id = -1
+  printf("- thread deleted\r\n");
+  // Todo: Return to normal execution / idle mode
+  while(1) asm volatile(".word 0xe320f003");
 }
 
-void switch_thread() {
-  // check for next ready/running thread
-  for (int i = (container.tcb_current_id + 1) & (THREAD_AMOUNT - 1);  // Todo: current ID is skipped!
-    i != container.tcb_current_id;
-    i = (i + 1) & (THREAD_AMOUNT - 1)) {
+int get_next_tcb() {
+  if (container.tcb_current_id == -1) {
+    for (int i = 0; i < THREAD_AMOUNT; i++) {
+      enum status thread_state = container.tcb_array[i].state;
+
+      if (thread_state == READY || thread_state == RUNNING) {
+        return i;
+      }
+    }
+  }
+
+  for (int i = (container.tcb_current_id + 1) & (THREAD_AMOUNT - 1);  // current ID is skipped!
+       i != container.tcb_current_id;
+       i = (i + 1) & (THREAD_AMOUNT - 1)) {
 
     enum status thread_state = container.tcb_array[i].state;
 
     if (thread_state == READY || thread_state == RUNNING) {
-      printf("TCB no. %d.\r\n", i);
-
-      // save context
-      tcb* current_thread = &container.tcb_array[container.tcb_current_id]; // Todo: -1 not possible!!!!!!!
-
-      // load context
-      tcb* next_thread = &container.tcb_array[i];
-      printf("Still alive 1...\r\n");
-
-      asm volatile(
-          "STMFD SP!, {r14} \n\t" // link register for interrupt
-          "STMFD SP!, {r0-r14}^ \n\t" // user registers
-          "MRS r2, spsr \n\t" // saved CPU state into R2
-          "STMFD SP!, {r2} \n\t" // and then to stack
-
-          // switch to other thread
-//          "STR SP, [r0] \n\t" // pcb->cpu_state = SP,   r0 = external c variable
-//          "LDR SP, [r1] \n\t" // SP = next_pcb->cpu_state
-
-          "STR SP, %[current_sp] \n\t" // pcb->cpu_state = SP,   r0 = external c variable
-          "LDR SP, %[next_sp] \n\t" // SP = next_pcb->cpu_state
-          : [current_sp] "=&o" (current_thread->stack_pointer)
-          : [next_sp] "o" (next_thread->stack_pointer)
-          :);
-
-
-      // set container->tcb_current_id
-      container.tcb_current_id = i;
-
-      if (thread_state == RUNNING) {
-        printf("Thread is in running state");
-        asm volatile(
-          // restore context
-            "LDMFD SP!, {r2} \n\t" // CPU state to R2
-            "MSR spsr, r2 \n\t" // and then into saved state
-            "LDMFD SP!, {r0-r14}^ \n\t" // user registers
-            "LDMFD SP!, {pc} \n\t" // link register for return from interrupt
-            );
-      } else if (thread_state == READY) {
-        printf("Thread is in ready state");
-
-        asm volatile(
-            "POP {PC}"
-            );
-      }
-
-      printf("Still alive 2...\r\n"); // Todo: CRASH
-      // set current_thread->tcb_state RUNNING
-      // print new line
-      printf("\r\n");
-      // continue
-      break;
+      return i;
     }
   }
+  // coming from existing thread
+  // no other thread found
+  return container.tcb_current_id;
+}
+
+void switch_thread() {
+  printf("~ Context Switch\r\n");
+  printf("~ tcb-count: %d\r\n", container.tcb_count);
+  printf("~ current tcb-ID: %d\r\n", container.tcb_current_id);
+  // check for next ready/running thread
+  if (container.tcb_count == 0) {
+    return;
+  }
+
+  // Todo: case for ID = -1 (switch from idle thread)
+  int next_tcb_id = get_next_tcb();
+  printf("~ next tcb-ID: %d\r\n", next_tcb_id);
+  if (next_tcb_id == container.tcb_current_id) {
+    return;
+  }
+
+  enum status thread_state = container.tcb_array[next_tcb_id].state;
+  printf("~ tcb-state: %d\r\n", thread_state);
+
+//  for (int i = (container.tcb_current_id + 1) & (THREAD_AMOUNT - 1);  // Todo: current ID is skipped!
+//       i != container.tcb_current_id;
+//       i = (i + 1) & (THREAD_AMOUNT - 1)) {
+//
+//    enum status thread_state = container.tcb_array[i].state;
+//    printf("~ Status: %d\r\n", thread_state);
+//
+//    if (thread_state == READY || thread_state == RUNNING) {
+//      printf("~ TCB no. %d.\r\n", i);
+
+  // save context
+  tcb *current_thread = &container.tcb_array[container.tcb_current_id]; // Todo: -1 not possible!!!!!!!
+
+  // load context
+  tcb *next_thread = &container.tcb_array[next_tcb_id];
+  //printf("Still alive 1...\r\n");
+
+  asm volatile(
+      "STMFD SP!, {r14} \n\t" // link register for interrupt
+      "STMFD SP!, {r0-r14}^ \n\t" // user registers
+      "MRS r2, spsr \n\t" // saved CPU state into R2
+      "STMFD SP!, {r2} \n\t" // and then to stack
+
+      // switch to other thread
+      //          "STR SP, [r0] \n\t" // pcb->cpu_state = SP,   r0 = external c variable
+      //          "LDR SP, [r1] \n\t" // SP = next_pcb->cpu_state
+
+      "STR SP, %[current_sp] \n\t" // pcb->cpu_state = SP,   r0 = external c variable
+      "LDR SP, %[next_sp] \n\t" // SP = next_pcb->cpu_state
+      : [current_sp] "=&o"(current_thread->stack_pointer)
+  : [next_sp] "o"(next_thread->stack_pointer)
+  :
+  );
+
+
+  // set container->tcb_current_id
+  container.tcb_current_id = next_tcb_id;
+
+  // print new line
+  printf("\r\n");
+
+  if (thread_state == RUNNING) {
+    printf("~ Thread is in running state\r\n");
+    asm volatile(
+      // restore context
+        "LDMFD SP!, {r2} \n\t" // CPU state to R2
+        "MSR spsr, r2 \n\t" // and then into saved state
+        "LDMFD SP!, {r0-r14}^ \n\t" // user registers
+        "LDMFD SP!, {pc} \n\t" // link register for return from interrupt
+        );
+
+  } else if (thread_state == READY) {
+    printf("~ Thread is in ready state\r\n");
+    container.tcb_array[next_tcb_id].state = RUNNING;
+    printf("~ Still alive...\r\n");
+
+    asm volatile(
+        "POP {PC}"
+        );
+  }
+
+  printf("~ Still alive 2...\r\n"); // Todo: CRASH
+  delete_thread();
+  // continue
   // Else (no thread) -> idle
 }
