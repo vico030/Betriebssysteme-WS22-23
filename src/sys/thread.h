@@ -10,5 +10,7 @@ void switch_thread(void);
 void delete_thread(void);
 //void init_tcb_container();
 void init_tcb_management ();
+void idle(void);
+void hello(void);
 
 #endif //BETRIEBSYSTEME_WS22_23_THREAD_H

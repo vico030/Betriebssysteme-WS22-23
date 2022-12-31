@@ -17,8 +17,11 @@ int set_channel_mode();
 
 char read_character();
 void write_character(unsigned char);
-void push_to_lq();
-char pop_from_lq();
+
+void push_to_lq(void);
+char pop_from_lq(void);
+char peek_at_lq(void);
+
 void init_DBGU();
 
 int  is_readable(void);

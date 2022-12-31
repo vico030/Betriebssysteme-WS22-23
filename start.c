@@ -59,8 +59,12 @@ void _start(void) {
   init_tcb_management();
   printf("Done.\r\n");
 
+  printf("Entering User Mode... ");
+  asm("mov r0, #0b10000\n\t" // #I_BIT:OR:ARM_MODE_IRQ
+      "msr CPSR, r0\n\t");
+  printf("Done.\r\n");
 
-  printf("\r\nStarting Demo Program... \r\n\r\n");
+  //printf("\r\nStarting Demo Program... \r\n\r\n");
   //print_timed_output();
 
 

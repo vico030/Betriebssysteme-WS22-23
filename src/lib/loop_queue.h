@@ -16,6 +16,7 @@ typedef struct {
 
 void lq_push(loop_queue* self, char c);
 char lq_pop(loop_queue* self);
+char lq_peek(loop_queue* self);
 void test_lq();
 
 #endif //BETRIEBSYSTEME_WS22_23_LOOP_QUEUE_H

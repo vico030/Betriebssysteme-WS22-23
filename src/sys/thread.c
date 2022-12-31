@@ -5,6 +5,7 @@
 #include "thread.h"
 #include "../lib/io.h"
 #include "../lib/printf.h"
+#include "../drv/dbgu.h"
 
 #define STACK_SIZE 0x1000
 #define THREAD_AMOUNT 16
@@ -22,6 +23,8 @@ typedef struct {
     unsigned int id;
     enum status state;
     unsigned int stack_pointer; // SP per Thread
+    unsigned int mode;
+    unsigned int return_address;
 } tcb;
 
 typedef struct {
@@ -61,8 +64,18 @@ void init_tcb_container(tcb_container *cont) {
   }
 }
 
+void idle(){
+  while (1) asm ("nop");
+}
+
+void hello(){
+  printf("Hello!");
+}
+
 void init_tcb_management() {
   init_tcb_container(&container);
+  create_thread((unsigned int ) &idle);
+  //switch_thread();
 }
 
 void create_thread(unsigned int function_ptr) {
@@ -73,19 +86,20 @@ void create_thread(unsigned int function_ptr) {
     new_thread->id = slot;
     new_thread->state = READY;
     new_thread->stack_pointer = BASE_ADDRESS - slot * STACK_SIZE;
+    new_thread->mode = 0b10000; // USR Mode
 
     container.tcb_count++;
 
     // push function pointer to SP
-    new_thread->stack_pointer -= 4;
+    //new_thread->stack_pointer--; // -= 4;
     write_u32(new_thread->stack_pointer, function_ptr);
 
-    // push r0 - r14 and SPSR to SP (in this case all 0) // Todo: potential boom - SPSR auf 0?
-//    for (int i = 1; i < 16; i++){  // Todo: 17 correct offset? 16?
+    // push r0 - r14 and SPSR to SP (in this case all 0) // Todo: fix SPSR
+//    for (int i = 1; i < 15; i++){
 //      write_u32(new_thread->stack_pointer - i, 0);
 //    }
 //    // set SP so all values can be popped on switch
-//    new_thread->stack_pointer -= 16;
+    new_thread->stack_pointer -= (15*4); // 4 per register!
     printf("+ thread created\r\n");
     printf("+ new thread state: %d, id: %d, sp: 0x%x, fp: 0x%x \r\n", new_thread->state, new_thread->id,
            new_thread->stack_pointer, function_ptr);
@@ -100,7 +114,7 @@ void delete_thread() {
   // Todo: Current id = -1
   printf("- thread deleted\r\n");
   // Todo: Return to normal execution / idle mode
-  while(1) asm volatile(".word 0xe320f003");
+  //while(1) asm volatile(".word 0xe320f003");
 }
 
 int get_next_tcb() {
@@ -159,7 +173,7 @@ void switch_thread() {
 //      printf("~ TCB no. %d.\r\n", i);
 
   // save context
-  tcb *current_thread = &container.tcb_array[container.tcb_current_id]; // Todo: -1 not possible!!!!!!!
+  tcb *current_thread = &container.tcb_array[container.tcb_current_id];
 
   // load context
   tcb *next_thread = &container.tcb_array[next_tcb_id];
@@ -172,13 +186,10 @@ void switch_thread() {
       "STMFD SP!, {r2} \n\t" // and then to stack
 
       // switch to other thread
-      //          "STR SP, [r0] \n\t" // pcb->cpu_state = SP,   r0 = external c variable
-      //          "LDR SP, [r1] \n\t" // SP = next_pcb->cpu_state
-
       "STR SP, %[current_sp] \n\t" // pcb->cpu_state = SP,   r0 = external c variable
       "LDR SP, %[next_sp] \n\t" // SP = next_pcb->cpu_state
       : [current_sp] "=&o"(current_thread->stack_pointer)
-  : [next_sp] "o"(next_thread->stack_pointer)
+  : [next_sp] "o" (next_thread->stack_pointer)
   :
   );
 
@@ -203,14 +214,22 @@ void switch_thread() {
     printf("~ Thread is in ready state\r\n");
     container.tcb_array[next_tcb_id].state = RUNNING;
     printf("~ Still alive...\r\n");
+    printf("~ Next char in queue: c%\r\n", peek_at_lq());
 
+    //void *delete_thread_address = &delete_thread;
     asm volatile(
-        "POP {PC}"
+        //set LR to delete function
+        //"ldr LR, %[exit] \n\t"
+        //"pop {PC}\n\t"
+        "pop {LR}\n\t" // Todo: bl instead?
+        :
+        : //[exit] "o" (delete_thread_address)
+        :
         );
   }
 
   printf("~ Still alive 2...\r\n"); // Todo: CRASH
-  delete_thread();
+  //delete_thread();
   // continue
   // Else (no thread) -> idle
 }
