@@ -60,13 +60,12 @@ void _start(void) {
   printf("Done.\r\n");
 
   printf("Entering User Mode... ");
-  asm("mov r0, #0b10000\n\t" // #I_BIT:OR:ARM_MODE_IRQ
+  asm("mov r0, #0b10000\n\t"
       "msr CPSR, r0\n\t");
   printf("Done.\r\n");
 
-  //printf("\r\nStarting Demo Program... \r\n\r\n");
-  //print_timed_output();
-
+  //todo: correct initialization! Set lr to exit function!
+  idle();
 
   while(1);
 }
