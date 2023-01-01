@@ -36,8 +36,6 @@ typedef struct {
 
 tcb_container container;
 
-// TCB linked List
-
 int get_empty_tcb_slot() {
   if (container.tcb_count == 0) {
     printf("+ found slot 0\r\n");
@@ -65,7 +63,10 @@ void init_tcb_container(tcb_container *cont) {
 }
 
 void idle(){
-  while (1) asm ("nop");
+  printf("i-");
+  while (1) {
+      asm volatile ("nop");
+  }
 }
 
 void hello(){
@@ -98,7 +99,8 @@ void create_thread(unsigned int function_ptr) {
 //    for (int i = 1; i < 15; i++){
 //      write_u32(new_thread->stack_pointer - i, 0);
 //    }
-//    // set SP so all values can be popped on switch
+
+    // set SP so all values can be popped on switch
     new_thread->stack_pointer -= (15*4); // 4 per register!
     printf("+ thread created\r\n");
     printf("+ new thread state: %d, id: %d, sp: 0x%x, fp: 0x%x \r\n", new_thread->state, new_thread->id,
@@ -111,10 +113,8 @@ void delete_thread() {
   // Todo: set all tcb values to 0
   container.tcb_array[container.tcb_current_id].state = TERMINATED;
   container.tcb_count--;
-  // Todo: Current id = -1
   printf("- thread deleted\r\n");
   // Todo: Return to normal execution / idle mode
-  //while(1) asm volatile(".word 0xe320f003");
 }
 
 int get_next_tcb() {
@@ -144,6 +144,9 @@ int get_next_tcb() {
 }
 
 void switch_thread() {
+
+  // NOTE: Old implementation! Doesn't work with current Register Saving routine in IRQ handler!
+
   printf("~ Context Switch\r\n");
   printf("~ tcb-count: %d\r\n", container.tcb_count);
   printf("~ current tcb-ID: %d\r\n", container.tcb_current_id);
@@ -152,7 +155,6 @@ void switch_thread() {
     return;
   }
 
-  // Todo: case for ID = -1 (switch from idle thread)
   int next_tcb_id = get_next_tcb();
   printf("~ next tcb-ID: %d\r\n", next_tcb_id);
   if (next_tcb_id == container.tcb_current_id) {
@@ -162,22 +164,11 @@ void switch_thread() {
   enum status thread_state = container.tcb_array[next_tcb_id].state;
   printf("~ tcb-state: %d\r\n", thread_state);
 
-//  for (int i = (container.tcb_current_id + 1) & (THREAD_AMOUNT - 1);  // Todo: current ID is skipped!
-//       i != container.tcb_current_id;
-//       i = (i + 1) & (THREAD_AMOUNT - 1)) {
-//
-//    enum status thread_state = container.tcb_array[i].state;
-//    printf("~ Status: %d\r\n", thread_state);
-//
-//    if (thread_state == READY || thread_state == RUNNING) {
-//      printf("~ TCB no. %d.\r\n", i);
-
   // save context
-  tcb *current_thread = &container.tcb_array[container.tcb_current_id];
+  tcb *current_thread = &container.tcb_array[container.tcb_current_id]; // Todo: get SP from Register
 
   // load context
   tcb *next_thread = &container.tcb_array[next_tcb_id];
-  //printf("Still alive 1...\r\n");
 
   asm volatile(
       "STMFD SP!, {r14} \n\t" // link register for interrupt

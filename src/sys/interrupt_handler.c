@@ -23,10 +23,10 @@ void normal_interrupt_handler() {
       "mov r2, r13\n\t" //IRP_SP
 
       //reset SP_IRQ
-      "add r13, #12\n\t"
+      "add r13, #12\n\t" // Todo: correct offset?
 
       // switch to SYS Mode, I-bit disabled
-      "msr CPSR, #0b10010010\n\t"
+      "msr CPSR, #0b10011111\n\t"
 
       // push IRQ_LR to stack
       "stmfd sp!, {r1}\n\t"
@@ -51,15 +51,11 @@ void normal_interrupt_handler() {
 
   // triggered by DBGU when readable char
   if (is_readable()) {
-    //printf("DBGU IRQ\r\n");
     // write in buffer
     push_to_lq();
-    //printf("Next char in queue: %c\r\n", peek_at_lq());
 
     // Todo: new Thread on character input
     //create_thread((unsigned int) &print_threaded_output);
-
-    //next_pc = &hello;
   }
 
   end_interrupt_request_handling();

@@ -60,11 +60,9 @@ void _start(void) {
   printf("Done.\r\n");
 
   printf("Entering User Mode... ");
-  asm("mov r0, #0b10000\n\t"
-      "msr CPSR, r0\n\t");
+  asm volatile("msr CPSR, #0b10000\n\t");
   printf("Done.\r\n");
 
-  //todo: correct initialization! Set lr to exit function!
   idle();
 
   while(1);
