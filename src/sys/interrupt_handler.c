@@ -15,8 +15,8 @@ void normal_interrupt_handler() {
   asm volatile(
     //";- Adjust and save LR of IRQ mode in current stack"
       "sub  r14, r14, #4\n\t"
-      // Scratch regs r0-r3
-      "stmfd sp!, {r0-r3}\n\t"
+      // Scratch regs r0-r2
+      "stmfd sp!, {r0-r2}\n\t"
 
       "mrs r0, SPSR\n\t" //IRQ_SPSR
       "mov r1, r14\n\t" //IRQ_LR
@@ -33,11 +33,11 @@ void normal_interrupt_handler() {
       // push SYS_LR to stack
       "stmfd sp!, {r14}\n\t"
       // push r3-r12 to stack
-      "stmfd sp!, {r3-r12}\n\t"
+      "stmfd sp!, {r3-r12}\n\t" // Reverse Order
 
       // push r0-r3 from IRQ_SP to stack
       "ldmfd r2!, {r3-r5}\n\t"
-      "ldmfd sp!, {r3-r5}\n\t"
+      "stmfd sp!, {r3-r5}\n\t"
 
       // push IRQ_SPSR to stack
       "stmfd sp!, {r0}\n\t"
@@ -62,8 +62,8 @@ void normal_interrupt_handler() {
   asm volatile(
       // Restore SPSR
       "ldmfd sp!, {r0}\n\t"
-      "msr spsr, r0\n\t"
+      "msr cpsr, r0\n\t"
 
-      "ldmfd sp!, {r0-r12, lr, pc}^\n\t"
+      "ldmfd sp!, {r0-r12, lr, pc}\n\t"
       );
 }
