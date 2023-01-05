@@ -43,25 +43,36 @@ void normal_interrupt_handler() {
       "stmfd sp!, {r0}\n\t"
       );
 
+  register int sp asm ("r13");
+  int stack_pointer = sp;
+
   // triggered by PITS when counter reached 0
   if (read_timer_status_register_PITS()) {
     printf("!");
-    //switch_thread();
+    //print_stack(stack_pointer, 16);
+    //printf("SP before: 0x%x\r\n", stack_pointer);
+    switch_thread(&stack_pointer); // Todo: Function call not possible because LR is lost after sp switch!!!!
+    //printf("SP after: 0x%x\r\n", stack_pointer);
+    asm volatile(
+        "mov SP, %[next_sp] \n\t"
+        :
+        : [next_sp] "r" (stack_pointer)
+    :
+    );
   }
 
   // triggered by DBGU when readable char
-  if (is_readable()) {
+  else if (is_readable()) {
     // write in buffer
     push_to_lq();
 
-    // Todo: new Thread on character input
-    //create_thread((unsigned int) &print_threaded_output);
+    create_thread((unsigned int) &print_threaded_output);
   }
 
   end_interrupt_request_handling();
   asm volatile(
       // Restore SPSR
-      "ldmfd sp!, {r0}\n\t"
+      "ldmfd sp!, {r0}\n\t" // True value 110010000 --> disable I bit?
       "msr cpsr, r0\n\t"
 
       "ldmfd sp!, {r0-r12, lr, pc}\n\t"

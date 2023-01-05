@@ -26,9 +26,9 @@ void print_timed_output(){
 }
 
 void print_threaded_output(){
-  printf("@ demo mode\r\n");
+  //printf("@ demo mode\r\n");
   char c = read_character();
-  printf("@ read character %c (as digits: %d)\r\n", c, c);
+  // printf("@ read character %c (as digits: %d)\r\n", c, c);
   if(c != '\0') {
     for (int i = 0; i < 10; i++) {
       printf("%c", c);
@@ -36,6 +36,5 @@ void print_threaded_output(){
         asm volatile("nop");
       }
     }
-    //delete_thread();
   }
 }

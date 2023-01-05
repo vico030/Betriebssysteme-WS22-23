@@ -63,7 +63,7 @@ void _start(void) {
   asm volatile("msr CPSR, #0b10000\n\t");
   printf("Done.\r\n");
 
-  idle();
+  //idle();
 
   while(1);
 }
