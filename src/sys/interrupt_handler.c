@@ -25,7 +25,7 @@ void normal_interrupt_handler() {
       //reset SP_IRQ
       "add r13, #12\n\t" // Todo: correct offset?
 
-      // switch to SYS Mode, I-bit disabled
+      // switch to SYS Mode, I-bit enabled
       "msr CPSR, #0b10011111\n\t"
 
       // push IRQ_LR to stack
@@ -72,7 +72,7 @@ void normal_interrupt_handler() {
   end_interrupt_request_handling();
   asm volatile(
       // Restore SPSR
-      "ldmfd sp!, {r0}\n\t" // True value 110010000 --> disable I bit?
+      "ldmfd sp!, {r0}\n\t"
       "msr cpsr, r0\n\t"
 
       "ldmfd sp!, {r0-r12, lr, pc}\n\t"

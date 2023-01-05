@@ -173,43 +173,20 @@ void switch_thread(int* stack_pointer) {
     return;
   }
 
-  //register int stack_pointer asm ("r13");
-  //print_stack(stack_pointer, 22);
-
   // save context if id != -1
   if (container.tcb_current_id != -1) {
-    tcb *current_thread = &container.tcb_array[container.tcb_current_id]; // Todo: ID = -1
+    tcb *current_thread = &container.tcb_array[container.tcb_current_id];
     current_thread->stack_pointer = *stack_pointer;
-//    asm volatile(
-//        "STR SP, %[current_sp] \n\t"
-//        : [current_sp] "=&o"(current_thread->stack_pointer)
-//    :
-//    :
-//    );
   }
 
   // load context
   tcb *next_thread = &container.tcb_array[next_tcb_id];
   write_u32((unsigned int) stack_pointer, next_thread->stack_pointer);
-//  asm volatile(
-//      "LDR SP, %[next_sp] \n\t"
-//      :
-//  : [next_sp] "o" (next_thread->stack_pointer)
-//  :
-//  );
-
-//  asm volatile(
-//      // switch stack pointers to enter next thread
-//      "STR SP, %[current_sp] \n\t"
-//      "LDR SP, %[next_sp] \n\t"
-//      : [current_sp] "=&o"(current_thread->stack_pointer)
-//  : [next_sp] "o" (next_thread->stack_pointer)
-//  :
-//  );
 
   // change TCB state
   enum status thread_state = container.tcb_array[next_tcb_id].state;
   // printf("~ tcb-state: %d\r\n", thread_state);
+
   if (thread_state == READY) {
     container.tcb_array[next_tcb_id].state = RUNNING;
   }
@@ -221,13 +198,4 @@ void switch_thread(int* stack_pointer) {
 
   // print new line
   printf("\r\n");
-
-//  end_interrupt_request_handling();
-//  asm volatile(
-//    // Restore SPSR
-//      "ldmfd sp!, {r0}\n\t"
-//      "msr cpsr, r0\n\t"
-//
-//      "ldmfd sp!, {r0-r12, lr, pc}\n\t"
-//      );
 }

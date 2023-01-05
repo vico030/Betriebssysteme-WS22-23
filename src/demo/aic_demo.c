@@ -30,9 +30,9 @@ void print_threaded_output(){
   char c = read_character();
   // printf("@ read character %c (as digits: %d)\r\n", c, c);
   if(c != '\0') {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 20; i++) {
       printf("%c", c);
-      for (int j = 0; j < 999999; j++) {
+      for (int j = 0; j < 99999999; j++) {
         asm volatile("nop");
       }
     }
