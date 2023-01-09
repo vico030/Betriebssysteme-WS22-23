@@ -9,7 +9,13 @@
 
 void stop_execution() {
   printf("Execution has terminated.\r\n");
-  while(1);
+  asm volatile(
+      "mrs r0, cpsr\n\t"
+      "orr r0, r0, #(1 << 7)\n\t" // Disable IRQ
+      "msr cpsr_c, r0\n\t"
+      "mov pc, lr\n\t"
+      );
+  while(1) continue;
 }
 
 __attribute__((section(".generic_interrupt_handler")))
