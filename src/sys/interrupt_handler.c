@@ -51,7 +51,7 @@ void normal_interrupt_handler() {
     printf("!");
     //print_stack(stack_pointer, 16);
     //printf("SP before: 0x%x\r\n", stack_pointer);
-    switch_thread(&stack_pointer); // Todo: Function call not possible because LR is lost after sp switch!!!!
+    switch_thread(&stack_pointer);
     //printf("SP after: 0x%x\r\n", stack_pointer);
     asm volatile(
         "mov SP, %[next_sp] \n\t"
@@ -65,7 +65,9 @@ void normal_interrupt_handler() {
   else if (is_readable()) {
     // write in buffer
     push_to_lq();
+    // Todo: unblock thread 0
 
+    // Todo: move to thread 0
     create_thread((unsigned int) &print_threaded_output);
   }
 

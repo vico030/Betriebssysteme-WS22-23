@@ -22,7 +22,7 @@ void trigger_software_interrupt() {
 
   printf("Now triggering software interrupt...\r\n");
 
-  asm("SWI 12");
+  asm("SWI #12");
 
   printf("...\r\n");
 }
@@ -31,7 +31,7 @@ void trigger_undefined_instruction_interrupt() {
 
   printf("Now triggering undefined instruction in...\r\n");
 
-  asm("UDF 0xde11"); // thumb illegal instruction 0xde11
+  asm("UDF #0xde11"); // thumb illegal instruction 0xde11
 
   printf("...\r\n");
 }
@@ -68,3 +68,22 @@ void mc_demo(){
     }
   }
 }
+
+
+void input_listener(){
+  while(1) {
+    for (int i = 0; i < dbgu_LQ.size_content; i++){
+      char character = swi_read_char();
+      swi_create_thread(&function(character));
+    }
+    sleep();
+  }
+}
+
+
+char swi_read_char(){
+  asm("swi 2");
+  register char character asm ("r0");
+  return character;
+}
+

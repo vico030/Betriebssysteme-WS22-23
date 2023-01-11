@@ -4,7 +4,9 @@
 
 #include "exception_handler.h"
 #include "../lib/printf.h"
+#include "../lib/io.h"
 #include "../drv/mc.h"
+#include "thread.h"
 
 
 void stop_execution() {
@@ -41,17 +43,47 @@ void data_abort_handler() {
 }
 
 __attribute__((section(".software_interrupt_handler")))
-void software_interrupt_handler() {
+void software_interrupt_handler(unsigned int swi_type) {
   asm volatile(
       //"sub  r14, r14, #4 \n\t"
-      "stmfd SP!, {r0-r12, r14}  \n\t"
+      "stmfd SP!, {r0-r12, r14} \n\t"
       );
 
   register int link_register asm ("r14");
-  printf("Software Interrupt received at 0x%x.\r\n", link_register - 4);
 
-  //asm volatile("ldmfd SP!, {r0-r12, PC}^");
-  stop_execution();
+  //int swi_type = read_u32(link_register - 4) & 0xFF;
+
+  switch (swi_type) {
+    case 1:
+      // write character
+      break;
+    case 2:
+      // read character
+      read_
+      break;
+    case 3:
+      // delete thread
+      delete_thread();
+      break;
+    case 4:
+      // create thread
+      create_thread();
+      break;
+    case 5:
+      // time lock thread
+      break;
+    default:
+      // stop execution
+      printf("Invalid Software Interrupt %d received at 0x%x.\r\n", swi_type, link_register - 4);
+      stop_execution();
+      break;
+  }
+
+
+
+  asm volatile(
+      "ldmfd SP!, {r0-r12, PC}^\n\t"
+      );
 }
 
 
