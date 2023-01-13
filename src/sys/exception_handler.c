@@ -7,6 +7,7 @@
 #include "../lib/io.h"
 #include "../drv/mc.h"
 #include "thread.h"
+#include "../demo/mc_demo.h"
 
 
 void stop_execution() {
@@ -42,35 +43,47 @@ void data_abort_handler() {
   stop_execution();
 }
 
+// TODO: REMOVE
+void start(){
+  while (1) {
+    printf("Hallo test thread function");
+  }
+}
 __attribute__((section(".software_interrupt_handler")))
-void software_interrupt_handler(unsigned int swi_type) {
+void software_interrupt_handler() {
   asm volatile(
       //"sub  r14, r14, #4 \n\t"
       "stmfd SP!, {r0-r12, r14} \n\t"
       );
 
   register int link_register asm ("r14");
-
-  //int swi_type = read_u32(link_register - 4) & 0xFF;
+  int swi_type = read_u32(link_register - 4) & 0xFF;
 
   switch (swi_type) {
     case 1:
       // write character
+      printf("swi: %d\r\n",swi_type);
       break;
     case 2:
       // read character
-      read_
+//      read_
+      printf("swi: %d\r\n",swi_type);
+      read_character_via_SWI();
       break;
     case 3:
       // delete thread
-      delete_thread();
+      printf("swi: %d\r\n",swi_type);
+//      delete_thread();
       break;
     case 4:
       // create thread
-      create_thread();
+      printf("swi: %d\r\n",swi_type);
+      //create_thread((unsigned int)&start);
+      create_thread_via_SWI();
       break;
     case 5:
       // time lock thread
+      printf("swi: %d\r\n",swi_type);
       break;
     default:
       // stop execution

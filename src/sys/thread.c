@@ -16,7 +16,9 @@
 enum status {
     READY,
     RUNNING,
-    TERMINATED
+    TERMINATED,
+    WAITING,
+    SLEEPING
 };
 
 typedef struct {

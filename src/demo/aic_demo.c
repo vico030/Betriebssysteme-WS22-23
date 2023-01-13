@@ -38,3 +38,17 @@ void print_threaded_output(){
     }
   }
 }
+
+void print_swi_output(){
+  //printf("@ demo mode\r\n");
+  register char c asm("r1");
+  // printf("@ read character %c (as digits: %d)\r\n", c, c);
+  if(c != '\0') {
+    for (int i = 0; i < 20; i++) {
+      printf("%c", c);
+      for (int j = 0; j < 99999999; j++) {
+        asm volatile("nop");
+      }
+    }
+  }
+}
