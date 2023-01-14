@@ -89,7 +89,10 @@ void software_interrupt_handler() {
     case 4:
       // create thread
       printf("swi: %d\r\n",swi_type);
-      create_thread((unsigned int)&start); //print_and_wait
+//      create_thread((unsigned int)&start); //print_and_wait
+      char character = registers[0];
+
+      create_thread_with_arg((unsigned int)&print_and_wait, character);
       //create_thread_via_SWI();
       break;
     case 5:

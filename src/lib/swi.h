@@ -7,7 +7,7 @@
 
 char swi_read_char(void);
 void swi_write_char(char);
-void swi_create_thread(void);
+void swi_create_thread(char);
 
 
 #endif //BETRIEBSYSTEME_WS22_23_SWI_H

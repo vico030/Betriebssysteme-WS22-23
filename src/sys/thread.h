@@ -6,6 +6,7 @@
 #define BETRIEBSYSTEME_WS22_23_THREAD_H
 
 void create_thread(unsigned int);
+void create_thread_with_arg(unsigned int,unsigned int);
 void switch_thread(int*);
 void delete_thread(void);
 //void init_tcb_container();

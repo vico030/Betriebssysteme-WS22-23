@@ -9,8 +9,6 @@
 
 
 void swi_write_char(char character){
-  register char output asm("r0");
-  output = character;
   asm("swi #1");
 }
 
@@ -20,8 +18,14 @@ char swi_read_char(){
   return character;
 }
 
- void swi_create_thread(){
-  asm("swi #4");
+
+
+ void swi_create_thread(char character){
+   asm volatile("mov r0, %[character] \n\t"
+                "swi #4 \n\t"
+       :
+       :[character] "r" (character)
+   :);
 }
 
 void swi_time_block(){

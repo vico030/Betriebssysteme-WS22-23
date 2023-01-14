@@ -15,7 +15,7 @@ void thread_spawner(){
 //      char character = swi_read_char();
       printf("Characters in queue: %d\r\n", get_size_content());
       swi_read_char(); // read here to decrement size and break loop
-      swi_create_thread();
+      swi_create_thread('F');
     }
     sleep_thread(0);
   }
@@ -40,8 +40,7 @@ void passive_wait(char character){
   }
 }
 
-void print_and_wait(){
-  char character = read_character(); //swi_read_char();
+void print_and_wait(char character){
   printf("Current character: %c \r\n", character);
   if (character >= 'a' && character <= 'z'){
     passive_wait(character);

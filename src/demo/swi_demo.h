@@ -5,5 +5,5 @@
 #ifndef BETRIEBSYSTEME_WS22_23_SWI_DEMO_H
 #define BETRIEBSYSTEME_WS22_23_SWI_DEMO_H
 void thread_spawner(void);
-void print_and_wait(void);
+void print_and_wait(char);
 #endif //BETRIEBSYSTEME_WS22_23_SWI_DEMO_H
