@@ -30,6 +30,7 @@ void active_wait(char character) {
       }
     }
 //    swi_delete_thread(0);
+    swi_write_char('X');
   }
 }
 

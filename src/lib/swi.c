@@ -9,7 +9,11 @@
 
 
 void swi_write_char(char character){
-  asm("swi #1");
+  asm volatile("mov r0, %[character] \n\t"
+               "swi #1 \n\t"
+      :
+      :[character] "r" (character)
+  :);
 }
 
 char swi_read_char(){
