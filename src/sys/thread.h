@@ -13,5 +13,9 @@ void init_tcb_management ();
 void idle(void);
 void hello(void);
 void print_stack(unsigned int, unsigned int);
+void sleep_thread(int);
+void wake_thread(int);
+void timer_unblock(void);
+void timer_block(int);
 
 #endif //BETRIEBSYSTEME_WS22_23_THREAD_H

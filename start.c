@@ -7,6 +7,7 @@
 #include "src/drv/st.h"
 #include "src/sys/interrupt_handler.h"
 #include "src/sys/thread.h"
+#include "src/demo/swi_demo.h"
 
 
 void mask_interrupt_bits_I_F() {
@@ -37,7 +38,7 @@ void _start(void) {
   printf("Done.\r\n");
 
   printf("Setting up period interval timer... ");
-  set_period_interval(34464);
+  set_period_interval(PITS_TIME_PERIOD);
   enable_period_interval_interrupt();
   printf("Done.\r\n");
 
@@ -58,6 +59,8 @@ void _start(void) {
   printf("Setting up TCB container... ");
   init_tcb_management();
   printf("Done.\r\n");
+
+  create_thread((unsigned int) &thread_spawner);
 
   printf("Entering User Mode... ");
   asm volatile("msr CPSR, #0b10000\n\t");

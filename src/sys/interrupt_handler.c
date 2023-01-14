@@ -50,6 +50,7 @@ void normal_interrupt_handler() {
     printf("!");
     //print_stack(stack_pointer, 16);
     //printf("SP before: 0x%x\r\n", stack_pointer);
+    timer_unblock();
     switch_thread(&stack_pointer);
     //printf("SP after: 0x%x\r\n", stack_pointer);
     asm volatile(
@@ -65,9 +66,11 @@ void normal_interrupt_handler() {
     // write in buffer
     push_to_lq();
 
-    //TODO: test of reading a char while in svc and using it somehwere else
-    printf("read from svc:%c\r\n", swi_read_char());
+    wake_thread(0);
 
+    //TODO: test of reading a char while in svc and using it somehwere else
+//    printf("read from svc:%c\r\n", swi_read_char());
+    //printf("%c\r\n",pop_from_lq());
     //swi_create_thread();
 
 

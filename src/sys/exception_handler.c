@@ -9,6 +9,7 @@
 #include "thread.h"
 #include "../demo/mc_demo.h"
 #include "../drv/dbgu.h"
+#include "../demo/swi_demo.h"
 
 
 void stop_execution() {
@@ -46,16 +47,18 @@ void data_abort_handler() {
 
 // TODO: REMOVE
 void start(){
-  while (1) {
     printf("Hallo test thread function");
-  }
 }
+
+
 __attribute__((section(".software_interrupt_handler")))
 void software_interrupt_handler() {
   asm volatile(
       //"sub  r14, r14, #4 \n\t"
       "stmfd SP!, {r0-r12, r14} \n\t"
       "mov r1, SP\n\t"
+      "mrs r0, spsr\n\t"
+      "stmfd sp!, {r0}\n\t"
       );
 
   register int link_register asm ("r14");
@@ -86,12 +89,13 @@ void software_interrupt_handler() {
     case 4:
       // create thread
       printf("swi: %d\r\n",swi_type);
-      //create_thread((unsigned int)&start);
+      create_thread((unsigned int)&start); //print_and_wait
       //create_thread_via_SWI();
       break;
     case 5:
       // time lock thread
       printf("swi: %d\r\n",swi_type);
+      timer_block(999999);
       break;
     default:
       // stop execution
@@ -101,6 +105,8 @@ void software_interrupt_handler() {
   }
 
   asm volatile(
+      "ldmfd sp!, {r0}\n\t"
+      "msr spsr_cf, r0\n\t"
       "ldmfd SP!, {r0-r12, PC}^\n\t"
       );
 }

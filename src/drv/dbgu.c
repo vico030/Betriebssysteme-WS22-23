@@ -134,6 +134,10 @@ inline char peek_at_lq(){
   return lq_peek(&DBGU_LQ);
 }
 
+inline int get_size_content(){
+  return DBGU_LQ.size_content;
+}
+
 inline void write_character(unsigned char character) {
     while ((read_u32(DBGU + DBGU_SR) & TXRDY) == 0);
     write_u8(DBGU + DBGU_THR, character);
