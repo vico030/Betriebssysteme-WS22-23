@@ -29,6 +29,7 @@ void active_wait(char character) {
         asm volatile("nop");
       }
     }
+//    swi_delete_thread(0);
   }
 }
 

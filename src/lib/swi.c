@@ -18,7 +18,13 @@ char swi_read_char(){
   return character;
 }
 
-
+void swi_delete_thread(unsigned int id){
+  asm volatile("mov r0, %[id] \n\t"
+               "swi #3 \n\t"
+      :
+      :[id] "r" (id)
+  :);
+}
 
  void swi_create_thread(char character){
    asm volatile("mov r0, %[character] \n\t"

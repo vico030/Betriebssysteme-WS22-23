@@ -8,7 +8,8 @@
 void create_thread(unsigned int);
 void create_thread_with_arg(unsigned int,unsigned int);
 void switch_thread(int*);
-void delete_thread(void);
+void delete_current_thread(void);
+void delete_thread(unsigned int);
 //void init_tcb_container();
 void init_tcb_management ();
 void idle(void);

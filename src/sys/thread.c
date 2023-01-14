@@ -106,7 +106,7 @@ void create_thread(unsigned int function_ptr) {
     new_thread->stack_pointer = initialize_stack(
         BASE_ADDRESS - slot * STACK_SIZE,
         function_ptr,
-        (unsigned int) &delete_thread,
+        (unsigned int) &delete_current_thread,
         0b10000
     );
 
@@ -127,7 +127,7 @@ void create_thread_with_arg(unsigned int function_ptr, unsigned int argument) {
     new_thread->stack_pointer = initialize_stack(
         BASE_ADDRESS - slot * STACK_SIZE,
         function_ptr,
-        (unsigned int) &delete_thread,
+        (unsigned int) &delete_current_thread,
         0b10000
     );
 
@@ -139,14 +139,19 @@ void create_thread_with_arg(unsigned int function_ptr, unsigned int argument) {
   }
 }
 
-void delete_thread() {
-  //printf("- deleting thread...\r\n");
+void delete_thread(unsigned int id) {
   // Todo: set all tcb values to 0
-  container.tcb_array[container.tcb_current_id].state = TERMINATED;
+  container.tcb_array[id].state = TERMINATED;
   container.tcb_count--;
   if (container.tcb_count == 0) {
     container.tcb_current_id = -1;
   }
+}
+
+void delete_current_thread() {
+  //printf("- deleting thread...\r\n");
+  // Todo: set all tcb values to 0
+  delete_thread(container.tcb_current_id);
   asm volatile ("mov SP, #0x5000"); // ????
   //printf("- thread deleted\r\n");
   // Return to idle mode
