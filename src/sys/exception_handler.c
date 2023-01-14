@@ -71,34 +71,31 @@ void software_interrupt_handler() {
   switch (swi_type) {
     case 1:
       // write character
-      printf("swi: %d\r\n",swi_type);
+      //printf("swi: %d\r\n",swi_type);
       char output = registers[0];
       write_character(output);
       break;
     case 2:
       // read character
-      printf("swi: %d\r\n", swi_type);
+      //printf("swi: %d\r\n", swi_type);
       char input = read_character();
       registers[0] = input;
       break;
     case 3:
       // delete thread
-      printf("swi: %d\r\n",swi_type);
+      //printf("swi: %d\r\n",swi_type);
 //      delete_thread();
       break;
     case 4:
       // create thread
-      printf("swi: %d\r\n",swi_type);
-//      create_thread((unsigned int)&start); //print_and_wait
+//      printf("swi: %d\r\n",swi_type);
       char character = registers[0];
-
       create_thread_with_arg((unsigned int)&print_and_wait, character);
-      //create_thread_via_SWI();
       break;
     case 5:
       // time lock thread
-      printf("swi: %d\r\n",swi_type);
-      timer_block(999999);
+//      printf("swi: %d\r\n",swi_type);
+      timer_block(99999);
       break;
     default:
       // stop execution

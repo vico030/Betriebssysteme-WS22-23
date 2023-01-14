@@ -28,7 +28,7 @@ char swi_read_char(){
    :);
 }
 
-void swi_time_block(){
+void swi_timer_block(){
   asm("swi #5");
 }
 

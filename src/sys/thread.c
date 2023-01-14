@@ -261,12 +261,11 @@ void switch_thread(int *stack_pointer) {
 void timer_unblock() {
   if (container.tcb_count == 0) return;
   for (int i = 0; i < THREAD_AMOUNT; i++) {
-    tcb tmp_tcb = container.tcb_array[i];
-    if (tmp_tcb.state == BLOCKED) {
-      tmp_tcb.unblock_time -= PITS_TIME_PERIOD;
-      if (tmp_tcb.unblock_time <= 0) {
-        tmp_tcb.state = RUNNING;
-        tmp_tcb.unblock_time = 0;
+    if (container.tcb_array[i].state == BLOCKED) {
+      container.tcb_array[i].unblock_time -= PITS_TIME_PERIOD;
+      if (container.tcb_array[i].unblock_time <= 0) {
+        container.tcb_array[i].state = RUNNING;
+        container.tcb_array[i].unblock_time = 0;
       }
     }
   }
@@ -275,4 +274,11 @@ void timer_unblock() {
 void timer_block(int block_time) {
   container.tcb_array[container.tcb_current_id].state = BLOCKED;
   container.tcb_array[container.tcb_current_id].unblock_time = block_time;
+//  while(get_current_thread_status() == BLOCKED){
+//    asm("nop");
+//  }
+}
+
+int get_current_thread_status(){
+  return container.tcb_array[container.tcb_current_id].state;
 }

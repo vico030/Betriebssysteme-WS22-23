@@ -9,13 +9,12 @@
 #include "../lib/printf.h"
 
 void thread_spawner(){
-  printf("Characters in queue: %d\r\n", get_size_content());
+  // printf("Characters in queue: %d\r\n", get_size_content());
   while(1) {
     for (int i = 0; i < get_size_content(); i++){
-//      char character = swi_read_char();
-      printf("Characters in queue: %d\r\n", get_size_content());
-      swi_read_char(); // read here to decrement size and break loop
-      swi_create_thread('F');
+      // read here to decrement size and break loop
+      char character = swi_read_char();
+      swi_create_thread(character);
     }
     sleep_thread(0);
   }
@@ -36,12 +35,17 @@ void active_wait(char character) {
 void passive_wait(char character){
   for (int i = 0; i < 20; i++) {
     printf("%c", character);
-    timer_block(9999999);
+    swi_timer_block();
+
+    // bridge time until next PITS interrupt
+    while(get_current_thread_status() == 4){
+      asm("nop");
+    }
   }
 }
 
 void print_and_wait(char character){
-  printf("Current character: %c \r\n", character);
+//  printf("Current character: %c \r\n", character);
   if (character >= 'a' && character <= 'z'){
     passive_wait(character);
   }
