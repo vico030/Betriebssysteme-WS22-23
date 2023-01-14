@@ -25,4 +25,5 @@ char peek_at_lq(void);
 void init_DBGU();
 
 int  is_readable(void);
+int  is_writeable(void);
 #endif //BETRIEBSYSTEME_WS22_23_DBGU_H

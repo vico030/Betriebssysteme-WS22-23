@@ -8,6 +8,7 @@
 #include "../drv/mc.h"
 #include "thread.h"
 #include "../demo/mc_demo.h"
+#include "../drv/dbgu.h"
 
 
 void stop_execution() {
@@ -54,21 +55,28 @@ void software_interrupt_handler() {
   asm volatile(
       //"sub  r14, r14, #4 \n\t"
       "stmfd SP!, {r0-r12, r14} \n\t"
+      "mov r1, SP\n\t"
       );
 
   register int link_register asm ("r14");
   int swi_type = read_u32(link_register - 4) & 0xFF;
 
+  register int stack_pointer asm ("r1");
+  unsigned *registers = (unsigned*) stack_pointer;
+
+
   switch (swi_type) {
     case 1:
       // write character
       printf("swi: %d\r\n",swi_type);
+      char output = registers[0];
+      write_character(output);
       break;
     case 2:
       // read character
-//      read_
-      printf("swi: %d\r\n",swi_type);
-      read_character_via_SWI();
+      printf("swi: %d\r\n", swi_type);
+      char input = read_character();
+      registers[0] = input;
       break;
     case 3:
       // delete thread
@@ -79,7 +87,7 @@ void software_interrupt_handler() {
       // create thread
       printf("swi: %d\r\n",swi_type);
       //create_thread((unsigned int)&start);
-      create_thread_via_SWI();
+      //create_thread_via_SWI();
       break;
     case 5:
       // time lock thread
@@ -91,8 +99,6 @@ void software_interrupt_handler() {
       stop_execution();
       break;
   }
-
-
 
   asm volatile(
       "ldmfd SP!, {r0-r12, PC}^\n\t"

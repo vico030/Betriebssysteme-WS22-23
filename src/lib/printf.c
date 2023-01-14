@@ -1,6 +1,7 @@
 #include "stdarg.h"
 #include "../drv/dbgu.h"
 #include "print.h"
+#include "swi.h"
 
 
 static char *convert_hex(unsigned int num, int base){
@@ -66,6 +67,7 @@ void printf(char *fmt, ...) {
     if(next_char != '%')
     {
       write_character(next_char);
+//      swi_write_char(next_char);
       continue;
     }
     next_char = *traverse;
@@ -76,6 +78,7 @@ void printf(char *fmt, ...) {
       case 'c' :
         i = va_arg(args, unsigned int );
         write_character(i);
+//        swi_write_char(i);
         break;
 
       case 's':

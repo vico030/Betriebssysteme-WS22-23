@@ -8,8 +8,7 @@
 #include "../drv/dbgu.h"
 #include "../lib/printf.h"
 #include "../sys/thread.h"
-#include "../demo/aic_demo.h"
-#include "../demo/mc_demo.h"
+#include "../lib/swi.h"
 
 void normal_interrupt_handler() {
   asm volatile(
@@ -67,9 +66,9 @@ void normal_interrupt_handler() {
     push_to_lq();
 
     //TODO: test of reading a char while in svc and using it somehwere else
-    printf("read from svc:%c\r\n",swi_read_char());
+    printf("read from svc:%c\r\n", swi_read_char());
 
-    swi_create_thread();
+    //swi_create_thread();
 
 
 
@@ -78,6 +77,7 @@ void normal_interrupt_handler() {
     // Todo: move to thread 0
     //create_thread((unsigned int) &print_threaded_output);
   }
+
 
   end_interrupt_request_handling();
   asm volatile(
