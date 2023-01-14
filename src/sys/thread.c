@@ -260,7 +260,7 @@ void switch_thread(int *stack_pointer) {
   //print_stack(container.tcb_array[container.tcb_current_id].stack_pointer, 16);
 
   // print new line
-  printf("\r\n");
+//  printf("\r\n");
 }
 
 void timer_unblock() {

@@ -47,7 +47,7 @@ void normal_interrupt_handler() {
 
   // triggered by PITS when counter reached 0
   if (read_timer_status_register_PITS()) {
-    printf("!");
+//    printf("!");
     //print_stack(stack_pointer, 16);
     //printf("SP before: 0x%x\r\n", stack_pointer);
     timer_unblock();
