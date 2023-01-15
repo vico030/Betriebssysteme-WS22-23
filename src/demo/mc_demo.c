@@ -22,7 +22,7 @@ void trigger_software_interrupt() {
 
   printf("Now triggering software interrupt...\r\n");
 
-  asm("SWI 12");
+  asm("SWI #12");
 
   printf("...\r\n");
 }
@@ -31,7 +31,7 @@ void trigger_undefined_instruction_interrupt() {
 
   printf("Now triggering undefined instruction in...\r\n");
 
-  asm("UDF 0xde11"); // thumb illegal instruction 0xde11
+  asm("UDF #0xde11"); // thumb illegal instruction 0xde11
 
   printf("...\r\n");
 }
@@ -68,3 +68,6 @@ void mc_demo(){
     }
   }
 }
+
+
+

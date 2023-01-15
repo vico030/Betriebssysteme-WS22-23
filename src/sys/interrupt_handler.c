@@ -8,8 +8,6 @@
 #include "../drv/dbgu.h"
 #include "../lib/printf.h"
 #include "../sys/thread.h"
-#include "../demo/aic_demo.h"
-
 
 void normal_interrupt_handler() {
   asm volatile(
@@ -48,10 +46,11 @@ void normal_interrupt_handler() {
 
   // triggered by PITS when counter reached 0
   if (read_timer_status_register_PITS()) {
-    printf("!");
+//    printf("!");
     //print_stack(stack_pointer, 16);
     //printf("SP before: 0x%x\r\n", stack_pointer);
-    switch_thread(&stack_pointer); // Todo: Function call not possible because LR is lost after sp switch!!!!
+    timer_unblock();
+    switch_thread(&stack_pointer);
     //printf("SP after: 0x%x\r\n", stack_pointer);
     asm volatile(
         "mov SP, %[next_sp] \n\t"
@@ -65,9 +64,9 @@ void normal_interrupt_handler() {
   else if (is_readable()) {
     // write in buffer
     push_to_lq();
-
-    create_thread((unsigned int) &print_threaded_output);
+    wake_thread(0); // activate thread spawner
   }
+
 
   end_interrupt_request_handling();
   asm volatile(

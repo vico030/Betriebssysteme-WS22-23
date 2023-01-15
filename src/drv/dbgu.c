@@ -118,7 +118,7 @@ inline void init_DBGU(){
 inline char read_character(void) {
     //while ((read_u32(DBGU + DBGU_SR) & RXRDY) == 0);
     //return (char) read_u32(DBGU + DBGU_RHR);
-    if(DBGU_LQ.size_content > 0) return lq_pop(&DBGU_LQ);
+    if(DBGU_LQ.size_content > 0) return pop_from_lq();
     return '\0';
 }
 
@@ -134,6 +134,10 @@ inline char peek_at_lq(){
   return lq_peek(&DBGU_LQ);
 }
 
+inline int get_size_content(){
+  return DBGU_LQ.size_content;
+}
+
 inline void write_character(unsigned char character) {
     while ((read_u32(DBGU + DBGU_SR) & TXRDY) == 0);
     write_u8(DBGU + DBGU_THR, character);
@@ -143,3 +147,6 @@ int is_readable(){
   return read_u32(DBGU + DBGU_SR) & RXRDY;
 }
 
+int is_writeable(){
+  return read_u32(DBGU + DBGU_SR) & TXRDY;
+}

@@ -9,5 +9,4 @@ void ivt() {
   asm("nop");
   asm("LDR PC,[PC,# -0xF20]");               // IRQ  -> LDR PC,[PC,# -&F20] for AIC handling (IVR handler)
   asm("LDR PC,[PC,# -0xF20]");              // FIQ  -> LDR PC,[PC,# -&F20] for AIC handling (IVR handler)
-
 }

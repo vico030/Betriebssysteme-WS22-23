@@ -21,8 +21,10 @@ void write_character(unsigned char);
 void push_to_lq(void);
 char pop_from_lq(void);
 char peek_at_lq(void);
+int get_size_content(void);
 
 void init_DBGU();
 
 int  is_readable(void);
+int  is_writeable(void);
 #endif //BETRIEBSYSTEME_WS22_23_DBGU_H

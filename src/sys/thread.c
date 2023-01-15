@@ -5,8 +5,7 @@
 #include "thread.h"
 #include "../lib/io.h"
 #include "../lib/printf.h"
-#include "../drv/dbgu.h"
-#include "../drv/aic.h"
+#include "../drv/st.h"
 
 #define STACK_SIZE 0x1000
 #define THREAD_AMOUNT 16
@@ -16,13 +15,16 @@
 enum status {
     READY,
     RUNNING,
-    TERMINATED
+    TERMINATED,
+    SLEEPING,
+    BLOCKED,
 };
 
 typedef struct {
     unsigned int id;
     enum status state;
     unsigned int stack_pointer; // SP per Thread
+    int unblock_time;
 } tcb;
 
 typedef struct {
@@ -60,21 +62,36 @@ void init_tcb_container(tcb_container *cont) {
   }
 }
 
-void idle(){
+void idle() {
   //printf("i-");
   while (1) {
-      asm volatile ("nop");
+    asm volatile ("nop");
   }
-}
-
-void hello(){
-  printf("Hello!");
 }
 
 void init_tcb_management() {
   init_tcb_container(&container);
   //create_thread((unsigned int ) &idle);
   //switch_thread();
+}
+
+unsigned int initialize_stack(unsigned int stack_pointer, unsigned int start_function, unsigned int end_function,
+                              unsigned int mode) {
+  stack_pointer -= 4;
+  write_u32(stack_pointer, start_function);
+  stack_pointer -= 4;
+  write_u32(stack_pointer, end_function);
+  for (int i = 0; i < 13; i++) {
+    stack_pointer -= 4;
+    write_u32(stack_pointer, 0x0);
+  }
+  stack_pointer -= 4;
+  write_u32(stack_pointer, mode);
+  return stack_pointer;
+}
+
+void set_stack_entry(unsigned int stack_pointer, unsigned int offset, unsigned int value){
+  write_u32(stack_pointer + offset, value);
 }
 
 void create_thread(unsigned int function_ptr) {
@@ -84,19 +101,14 @@ void create_thread(unsigned int function_ptr) {
     tcb *new_thread = &container.tcb_array[slot];
     new_thread->id = slot;
     new_thread->state = READY;
+    new_thread->unblock_time = 0;
 
-    // setup stack for context switch
-    new_thread->stack_pointer = BASE_ADDRESS - slot * STACK_SIZE;
-    new_thread->stack_pointer -= 4;
-    write_u32(new_thread->stack_pointer, function_ptr);
-    new_thread->stack_pointer -= 4;
-    write_u32(new_thread->stack_pointer, (unsigned int) &delete_thread);
-    for (int i = 0; i < 13; i++){
-      new_thread->stack_pointer -= 4;
-      write_u32(new_thread->stack_pointer, 0x0);
-    }
-    new_thread->stack_pointer -= 4;
-    write_u32(new_thread->stack_pointer, 0b10000);
+    new_thread->stack_pointer = initialize_stack(
+        BASE_ADDRESS - slot * STACK_SIZE,
+        function_ptr,
+        (unsigned int) &delete_current_thread,
+        0b10000
+    );
 
     container.tcb_count++;
     //printf("+ thread created\r\n");
@@ -104,19 +116,56 @@ void create_thread(unsigned int function_ptr) {
   }
 }
 
-void delete_thread() {
-  //printf("- deleting thread...\r\n");
+void create_thread_with_arg(unsigned int function_ptr, unsigned int argument) {
+  int slot = get_empty_tcb_slot();
+  if (slot != -1) {
+    tcb *new_thread = &container.tcb_array[slot];
+    new_thread->id = slot;
+    new_thread->state = READY;
+    new_thread->unblock_time = 0;
+
+    new_thread->stack_pointer = initialize_stack(
+        BASE_ADDRESS - slot * STACK_SIZE,
+        function_ptr,
+        (unsigned int) &delete_current_thread,
+        0b10000
+    );
+
+    // set r0 to value so that it is read as function argument when thread starts
+    set_stack_entry(new_thread->stack_pointer, 4, argument);
+//    print_stack(new_thread->stack_pointer, 16);
+
+    container.tcb_count++;
+  }
+}
+
+void delete_thread(unsigned int id) {
   // Todo: set all tcb values to 0
-  container.tcb_array[container.tcb_current_id].state = TERMINATED;
+  container.tcb_array[id].state = TERMINATED;
   container.tcb_count--;
-  if (container.tcb_count == 0){
+  if (container.tcb_count == 0) {
     container.tcb_current_id = -1;
   }
+}
+
+void delete_current_thread() {
+  //printf("- deleting thread...\r\n");
+  // Todo: set all tcb values to 0
+  delete_thread(container.tcb_current_id);
   asm volatile ("mov SP, #0x5000"); // ????
   //printf("- thread deleted\r\n");
   // Return to idle mode
   idle();
 }
+
+void sleep_thread(int id) {
+  container.tcb_array[id].state = SLEEPING;
+}
+
+void wake_thread(int id) {
+  container.tcb_array[id].state = RUNNING;
+}
+
 
 int schedule_next_tcb() {
   if (container.tcb_current_id == -1) {
@@ -127,16 +176,16 @@ int schedule_next_tcb() {
         return i;
       }
     }
-  }
+  } else {
+    for (int i = (container.tcb_current_id + 1) & (THREAD_AMOUNT - 1);  // current ID is skipped!
+         i != container.tcb_current_id;
+         i = (i + 1) & (THREAD_AMOUNT - 1)) {
 
-  for (int i = (container.tcb_current_id + 1) & (THREAD_AMOUNT - 1);  // current ID is skipped!
-       i != container.tcb_current_id;
-       i = (i + 1) & (THREAD_AMOUNT - 1)) {
+      enum status thread_state = container.tcb_array[i].state;
 
-    enum status thread_state = container.tcb_array[i].state;
-
-    if (thread_state == READY || thread_state == RUNNING) {
-      return i;
+      if (thread_state == READY || thread_state == RUNNING) {
+        return i;
+      }
     }
   }
   // coming from existing thread
@@ -144,19 +193,24 @@ int schedule_next_tcb() {
   return container.tcb_current_id;
 }
 
-void print_stack(unsigned int sp, unsigned int items){
+void print_stack(unsigned int sp, unsigned int items) {
   unsigned int tmp_sp = sp;
   printf("\r\nStack Pointer currently at: 0x%x\r\n", tmp_sp);
   printf("Last %d items on stack:\r\n", items);
-  for (unsigned int i = 0; i < items; i++){
+  for (unsigned int i = 0; i < items; i++) {
     printf("  0x%x\r\n", read_u32(tmp_sp));
     tmp_sp += 4;
   }
 }
 
+unsigned int create_dummy_stack() {
+  return initialize_stack(0x5000,
+                          (unsigned int) &idle,
+                          (unsigned int) &idle,
+                          0b10000);
+}
 
-
-void switch_thread(int* stack_pointer) {
+void switch_thread(int *stack_pointer) {
 //  printf("~ Context Switch\r\n");
 //  printf("~ tcb-count: %d\r\n", container.tcb_count);
 //  printf("~ current tcb-ID: %d\r\n", container.tcb_current_id);
@@ -170,6 +224,15 @@ void switch_thread(int* stack_pointer) {
 
 //  printf("~ next tcb-ID: %d\r\n", next_tcb_id);
   if (next_tcb_id == container.tcb_current_id) {
+    if (container.tcb_array[container.tcb_current_id].state == SLEEPING ||
+        container.tcb_array[container.tcb_current_id].state == BLOCKED) {
+      // create dummy stack to get into idle mode
+      // save tcb and idle!!!
+      tcb *current_thread = &container.tcb_array[container.tcb_current_id];
+      current_thread->stack_pointer = *stack_pointer;
+      write_u32((unsigned int) stack_pointer, create_dummy_stack());
+      container.tcb_current_id = -1;
+    }
     return;
   }
 
@@ -194,8 +257,28 @@ void switch_thread(int* stack_pointer) {
   // set container->tcb_current_id
   container.tcb_current_id = next_tcb_id;
 
-  //print_stack(container.tcb_array[container.tcb_current_id].stack_pointer, 16);
-
   // print new line
-  printf("\r\n");
+//  printf("\r\n");
+}
+
+void timer_unblock() {
+  if (container.tcb_count == 0) return;
+  for (int i = 0; i < THREAD_AMOUNT; i++) {
+    if (container.tcb_array[i].state == BLOCKED) {
+      container.tcb_array[i].unblock_time -= PITS_TIME_PERIOD;
+      if (container.tcb_array[i].unblock_time <= 0) {
+        container.tcb_array[i].state = RUNNING;
+        container.tcb_array[i].unblock_time = 0;
+      }
+    }
+  }
+}
+
+void timer_block(int block_time) {
+  container.tcb_array[container.tcb_current_id].state = BLOCKED;
+  container.tcb_array[container.tcb_current_id].unblock_time = block_time;
+}
+
+int get_current_thread_status(){
+  return container.tcb_array[container.tcb_current_id].state;
 }
