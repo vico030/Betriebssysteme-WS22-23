@@ -7,9 +7,11 @@
 #include "../drv/dbgu.h"
 #include "../sys/thread.h"
 #include "../lib/printf.h"
+#include "../lib/io.h"
 
 void thread_spawner(){
   // printf("Characters in queue: %d\r\n", get_size_content());
+  printf("Input uppercase letter for active waiting demo, lowercase letter for passive waiting demo. \r\n");
   while(1) {
     for (int i = 0; i < get_size_content(); i++){
       // read here to decrement size and break loop
@@ -29,6 +31,7 @@ void active_wait(char character) {
         asm volatile("nop");
       }
     }
+    // Testing unused Software Interrupts:
 //    swi_delete_thread(0);
 //    swi_write_char('X');
   }
@@ -38,11 +41,6 @@ void passive_wait(char character){
   for (int i = 0; i < 20; i++) {
     printf("%c", character);
     swi_timer_block();
-
-    // bridge time until next PITS interrupt
-    while(get_current_thread_status() == 4){
-      asm("nop");
-    }
   }
 }
 

@@ -44,6 +44,4 @@ void end_interrupt_request_handling(){
 void clear_sys_interrupt(){
   write_u32(AIC + AIC_ICCR,SYS);
 }
-// Interrupt Vector register read -> Handling start
-// End of Interrupt Command Register -> Handling end
 

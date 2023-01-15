@@ -5,7 +5,7 @@
 #ifndef BETRIEBSSYSTEME_WS22_23_ST_H
 #define BETRIEBSSYSTEME_WS22_23_ST_H
 
-#define PITS_TIME_PERIOD 34464
+#define PITS_TIME_PERIOD 14464
 
 void enable_period_interval_interrupt(void);
 

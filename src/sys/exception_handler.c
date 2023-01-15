@@ -7,9 +7,9 @@
 #include "../lib/io.h"
 #include "../drv/mc.h"
 #include "thread.h"
-#include "../demo/mc_demo.h"
 #include "../drv/dbgu.h"
 #include "../demo/swi_demo.h"
+#include "../drv/st.h"
 
 
 void stop_execution() {
@@ -39,9 +39,6 @@ void data_abort_handler() {
 
   register int link_register asm("r14");
   printf("Data Abort received at 0x%x while accessing 0x%x.\r\n", link_register - 4, get_abort_address());
-
-  //asm volatile("ldmfd SP!, {r0-r12, PC}^");
-
   stop_execution();
 }
 
@@ -54,7 +51,6 @@ void start(){
 __attribute__((section(".software_interrupt_handler")))
 void software_interrupt_handler() {
   asm volatile(
-      //"sub  r14, r14, #4 \n\t"
       "stmfd SP!, {r0-r12, r14} \n\t"
       "mov r1, SP\n\t"
       "mrs r0, spsr\n\t"
@@ -86,13 +82,13 @@ void software_interrupt_handler() {
       break;
     case 4:
       // create thread
-//      printf("swi: %d\r\n",swi_type);
+      //printf("swi: %d\r\n",swi_type);
       create_thread_with_arg((unsigned int)&print_and_wait, registers[0]);
       break;
     case 5:
       // time lock thread
-//      printf("swi: %d\r\n",swi_type);
-      timer_block(99999);
+      //printf("swi: %d\r\n",swi_type);
+      timer_block(PITS_TIME_PERIOD * 4);
       break;
     default:
       // stop execution
@@ -112,14 +108,10 @@ void software_interrupt_handler() {
 __attribute__((section(".undefined_instruction_handler")))
 void undefined_instruction_handler() {
   asm volatile(
-      //"sub  r14, r14, #4 \n\t"
       "stmfd SP!, {r0-r12, r14}  \n\t"
       );
 
   register int link_register asm ("r14");
   printf("Undefined Instruction received at 0x%x.\r\n", link_register - 4);
-
-  //asm volatile("ldmfd SP!, {r0-r12, PC}^");
-
   stop_execution();
 }

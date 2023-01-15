@@ -4,8 +4,6 @@
 
 #include "swi.h"
 #include "../sys/thread.h"
-#include "../demo/aic_demo.h"
-#include "../lib/printf.h"
 
 
 void swi_write_char(char character){
@@ -40,6 +38,10 @@ void swi_delete_thread(unsigned int id){
 
 void swi_timer_block(){
   asm("swi #5");
+  // active wait until next IRQ
+  while(get_current_thread_status() == 4){
+    asm("nop");
+  }
 }
 
 

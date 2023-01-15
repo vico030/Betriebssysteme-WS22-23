@@ -1,4 +1,3 @@
-#include "src/demo/aic_demo.h"
 #include "src/lib/printf.h"
 #include "src/drv/mc.h"
 #include "src/drv/dbgu.h"
@@ -65,11 +64,6 @@ void _start(void) {
   printf("Entering User Mode... ");
   asm volatile("msr CPSR, #0b10000\n\t");
   printf("Done.\r\n");
-
-//  printf("trigger swi \r\n");
-//  asm("swi #4\n");
-
-  idle();
 
   while(1);
 }

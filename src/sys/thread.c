@@ -257,8 +257,6 @@ void switch_thread(int *stack_pointer) {
   // set container->tcb_current_id
   container.tcb_current_id = next_tcb_id;
 
-  //print_stack(container.tcb_array[container.tcb_current_id].stack_pointer, 16);
-
   // print new line
 //  printf("\r\n");
 }
@@ -279,9 +277,6 @@ void timer_unblock() {
 void timer_block(int block_time) {
   container.tcb_array[container.tcb_current_id].state = BLOCKED;
   container.tcb_array[container.tcb_current_id].unblock_time = block_time;
-//  while(get_current_thread_status() == BLOCKED){
-//    asm("nop");
-//  }
 }
 
 int get_current_thread_status(){
